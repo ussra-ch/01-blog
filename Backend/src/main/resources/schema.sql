@@ -1,4 +1,3 @@
-
 -- -------------------------------------------------------------
 --  USERS
 -- -------------------------------------------------------------
@@ -58,7 +57,7 @@ CREATE TABLE IF NOT EXISTS likes (
 
 
 -- -------------------------------------------------------------
---  SUBSCRIPTIONS (self-referencing on users)
+--  SUBSCRIPTIONS
 -- -------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS subscriptions (
     id              BIGSERIAL   PRIMARY KEY,
@@ -105,7 +104,7 @@ CREATE TABLE IF NOT EXISTS reports (
 
 
 -- -------------------------------------------------------------
---  INDEXES (for performance on frequent queries)
+--  INDEXES
 -- -------------------------------------------------------------
 CREATE INDEX IF NOT EXISTS idx_posts_user_id         ON posts(user_id);
 CREATE INDEX IF NOT EXISTS idx_comments_post_id      ON comments(post_id);
