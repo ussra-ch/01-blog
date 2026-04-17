@@ -96,41 +96,49 @@ ok "Angular CLI ready → $(ng version 2>/dev/null | grep 'Angular CLI' | head -
 # =============================================================
 #  5. POSTGRESQL (user-space via conda/portable install)
 # =============================================================
-log "Setting up PostgreSQL (user-space)..."
+# log "Setting up PostgreSQL (user-space)..."
 
-PG_DIR="$INSTALL_DIR/pgsql"
+# PG_VERSION="16.3"
+# PG_SRC_DIR="$INSTALL_DIR/postgresql-$PG_VERSION"
+# PG_DATA="$INSTALL_DIR/pgdata"
 
-if [ ! -d "$PG_DIR" ]; then
-  PG_VERSION="16.3"
-  PG_TAR="postgresql-$PG_VERSION-linux-x64-binaries.tar.gz"
-  PG_URL="https://get.enterprisedb.com/postgresql/$PG_TAR"
+# if [ ! -d "$PG_SRC_DIR" ]; then
+#   log "Downloading PostgreSQL $PG_VERSION source..."
 
-  log "Downloading PostgreSQL $PG_VERSION binaries..."
-  curl -L "$PG_URL" -o "/tmp/$PG_TAR"
-  tar -xzf "/tmp/$PG_TAR" -C "$INSTALL_DIR"
-  rm "/tmp/$PG_TAR"
+#   curl -L -o /tmp/postgresql.tar.gz \
+#     "https://ftp.postgresql.org/pub/source/v$PG_VERSION/postgresql-$PG_VERSION.tar.gz"
 
-  # init DB cluster
-  "$PG_DIR/bin/initdb" -D "$INSTALL_DIR/pgdata" --encoding=UTF8 --locale=C
-  ok "PostgreSQL $PG_VERSION installed and initialized"
-else
-  warn "PostgreSQL already installed, skipping"
-fi
+#   tar -xzf /tmp/postgresql.tar.gz -C "$INSTALL_DIR"
+#   rm /tmp/postgresql.tar.gz
 
-# add pg binaries to PATH
-add_to_profile "export PATH=\"$PG_DIR/bin:\$PATH\""
-export PATH="$PG_DIR/bin:$PATH"
+#   # build & install
+#   cd "$PG_SRC_DIR" || exit 1
+#   ./configure --prefix="$INSTALL_DIR/pgsql"
+#   make -j$(nproc)
+#   make install
 
-# start postgres (user-space, port 5432)
-log "Starting PostgreSQL..."
-PG_LOG="$INSTALL_DIR/pg.log"
-pg_ctl -D "$INSTALL_DIR/pgdata" -l "$PG_LOG" start 2>/dev/null || warn "PostgreSQL may already be running"
+#   # init DB
+#   "$INSTALL_DIR/pgsql/bin/initdb" -D "$PG_DATA" --encoding=UTF8 --locale=C
 
-sleep 2
+#   ok "PostgreSQL $PG_VERSION built and installed"
+# else
+#   warn "PostgreSQL already installed, skipping"
+# fi
 
-# create 01blog database
-createdb 01blog 2>/dev/null || warn "Database '01blog' already exists"
-ok "PostgreSQL ready → database '01blog' created"
+# # add pg binaries to PATH
+# add_to_profile "export PATH=\"$PG_DIR/bin:\$PATH\""
+# export PATH="$PG_DIR/bin:$PATH"
+
+# # start postgres (user-space, port 5432)
+# log "Starting PostgreSQL..."
+# PG_LOG="$INSTALL_DIR/pg.log"
+# pg_ctl -D "$INSTALL_DIR/pgdata" -l "$PG_LOG" start 2>/dev/null || warn "PostgreSQL may already be running"
+
+# sleep 2
+
+# # create 01blog database
+# createdb 01blog 2>/dev/null || warn "Database '01blog' already exists"
+# ok "PostgreSQL ready → database '01blog' created"
 
 # =============================================================
 #  6. VS CODE (user-space .deb install)
@@ -222,10 +230,10 @@ echo ""
 
 # Ila bghitiii t runi hadchiiiiiiii :
 # 1. make it executable
-chmod +x setup.sh
+# chmod +x setup.sh
 
 # 2. run it
-./setup.sh
+# ./setup.sh
 
 # 3. apply PATH changes
-source ~/.bashrc
+# source ~/.bashrc
