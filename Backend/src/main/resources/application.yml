@@ -1,23 +1,16 @@
 spring:
   application:
     name: 01blog
-
   datasource:
-    url: jdbc:postgresql://localhost:5432/01blog
-    username: postgres
-    password: ""
-
-  jpa:
-    hibernate:
-      ddl-auto: update
-    show-sql: true
-    properties:
-      hibernate:
-        format_sql: true
-
+    url: jdbc:postgresql://localhost:5431/mydb
+    username: 01blog
+    password: 01blog
   sql:
     init:
       mode: always
-
+  jpa:
+    hibernate:
+      ddl-auto: none
 server:
   port: 8080
+
