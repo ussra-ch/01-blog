@@ -237,3 +237,5 @@ echo ""
 
 # 3. apply PATH changes
 # source ~/.bashrc
+
+#./mvnw spring-boot:run
