@@ -1,16 +1,19 @@
+package com.ussra._blog.model;
 import java.time.LocalDateTime;
-
-import org.springframework.security.core.userdetails.UserDetails;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
+import lombok.Getter;
+import lombok.Setter;
 import jakarta.persistence.Id;
 
+@Getter
+@Setter
 @Entity
 @Table(name = "users")
-public class User{
-    
+public class User {
+
     @Id
     private Long id;
     private String username;
