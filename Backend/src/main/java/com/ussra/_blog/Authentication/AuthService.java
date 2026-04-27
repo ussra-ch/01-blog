@@ -1,11 +1,9 @@
-package com.ussra._blog.services;
+package com.ussra._blog.Authentication;
 
-import com.ussra._blog.dto.AuthResponse;
-import com.ussra._blog.dto.LoginRequest;
-import com.ussra._blog.dto.RegisterRequest;
-import com.ussra._blog.model.User;
-import com.ussra._blog.repository.UserRepository;
-import com.ussra._blog.security.UserPrincipal;
+import com.ussra._blog.User.User;
+import com.ussra._blog.User.UserPrincipal;
+import com.ussra._blog.User.UserRepository;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;

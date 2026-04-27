@@ -1,6 +1,8 @@
 package com.ussra._blog.security;
 
-import com.ussra._blog.services.UserDetailsServiceImpl;
+import com.ussra._blog.Authentication.JwtAuthenticationFilter;
+import com.ussra._blog.Authentication.UserDetailsServiceImpl;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

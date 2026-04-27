@@ -1,9 +1,5 @@
-package com.ussra._blog.controller;
+package com.ussra._blog.Authentication;
 
-import com.ussra._blog.dto.AuthResponse;
-import com.ussra._blog.dto.LoginRequest;
-import com.ussra._blog.dto.RegisterRequest;
-import com.ussra._blog.services.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

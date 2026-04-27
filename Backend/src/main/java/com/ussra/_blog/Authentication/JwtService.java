@@ -1,4 +1,4 @@
-package com.ussra._blog.services;
+package com.ussra._blog.Authentication;
 
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Value;

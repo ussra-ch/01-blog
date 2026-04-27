@@ -1,4 +1,4 @@
-package com.ussra._blog.dto;
+package com.ussra._blog.Authentication;
 
 import lombok.Data;
 

@@ -1,4 +1,4 @@
-package com.ussra._blog.model;
+package com.ussra._blog.User;
 
 import java.time.LocalDateTime;
 

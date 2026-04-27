@@ -1,12 +1,11 @@
-package com.ussra._blog.security;
+package com.ussra._blog.User;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+
 import java.util.Collection;
 import java.util.List;
-
-import com.ussra._blog.model.User;
 
 import lombok.Getter;
 
