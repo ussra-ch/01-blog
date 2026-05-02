@@ -1,0 +1,19 @@
+/* Ensure the container takes up at least the full height of the viewport */
+.app-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: #f9fafb; /* matches Tailwind's bg-gray-50 */
+}
+
+/* This targets the area where your routed components (Login/Feed) appear */
+main {
+  flex: 1;
+  width: 100%;
+}
+
+/* Optional: Smooth scrolling for the whole app */
+:host {
+  display: block;
+  scroll-behavior: smooth;
+}

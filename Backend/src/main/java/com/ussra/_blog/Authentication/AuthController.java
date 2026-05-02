@@ -14,6 +14,7 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<AuthResponse> register(@ModelAttribute RegisterRequest request) throws IOException {
+        // System.out.println("registeeeeeeer");
         return ResponseEntity.ok(authService.register(request));
     }
 

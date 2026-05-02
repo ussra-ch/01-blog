@@ -1,0 +1,57 @@
+import { Injectable, PLATFORM_ID, inject, signal } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
+import { HttpClient } from '@angular/common/http';
+import { AuthResponse } from '../models/auth-response';
+import { tap } from 'rxjs';
+
+@Injectable({ providedIn: 'root' })
+export class AuthService {
+  private platformId = inject(PLATFORM_ID);
+  private http = inject(HttpClient);
+  private readonly API_URL = 'http://localhost:8080/api/auth';
+
+  // State management using Signals
+  currentUser = signal<AuthResponse | null>(this.getUserFromStorage());
+
+  /**
+   * Check if a user is currently authenticated
+   * Used by AuthGuard
+   */
+  isLoggedIn(): boolean {
+    return !!this.currentUser();
+  }
+
+  login(credentials: any) {
+    return this.http.post<AuthResponse>(`${this.API_URL}/login`, credentials).pipe(
+      tap(res => {
+        if (isPlatformBrowser(this.platformId)) {
+          localStorage.setItem('auth_token', res.token);
+          localStorage.setItem('user_data', JSON.stringify(res));
+          this.currentUser.set(res);
+        }
+      })
+    );
+  }
+
+  logout() {
+    if (isPlatformBrowser(this.platformId)) {
+      localStorage.removeItem('auth_token');
+      localStorage.removeItem('user_data');
+    }
+    this.currentUser.set(null);
+  }
+
+  register(userData: any) {
+    // console.log("hnaaaaa 1:")
+    // console.log(userData)
+  return this.http.post(`${this.API_URL}/register`, userData);
+}
+
+  private getUserFromStorage(): AuthResponse | null {
+    if (isPlatformBrowser(this.platformId)) {
+      const data = localStorage.getItem('user_data');
+      return data ? JSON.parse(data) : null;
+    }
+    return null;
+  }
+}

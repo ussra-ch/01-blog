@@ -22,6 +22,8 @@ public class AuthService {
     private final FileStorageService fileStorageService;
 
     public AuthResponse register(RegisterRequest request) throws IOException {
+        System.out.println("---------------------------------------");
+        System.out.println("REAQUEST ISSSSS :" + request.getPassword());
         User user = new User();
         user.setUsername(request.getUsername());
         user.setEmail(request.getEmail());
@@ -30,11 +32,15 @@ public class AuthService {
         user.setRole("USER");
 
         if (request.getAvatar() != null && !request.getAvatar().isEmpty()) {
-            String avatarUrl = fileStorageService.saveFile(request.getAvatar());
-            user.setAvatarUrl(avatarUrl);
+            if (request.getAvatar().getContentType().equals("image/jpeg") || request.getAvatar().getContentType().equals("image/png")){
+                String avatarUrl = fileStorageService.saveFile(request.getAvatar());
+                user.setAvatarUrl(avatarUrl);
+            }
         }
         userRepository.save(user);
         User savedUser = userRepository.findByUsername(request.getUsername()).orElseThrow();
+
+        System.out.println("PASSWOOOOOOOOORD IS : " + user.getPassword());
 
         UserPrincipal userPrincipal = new UserPrincipal(user);
         String token = jwtService.generateToken(userPrincipal);
