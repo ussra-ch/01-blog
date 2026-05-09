@@ -1,6 +1,8 @@
 package com.ussra._blog.posts.services;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -12,6 +14,7 @@ import com.ussra._blog.posts.dto.UpdatePostRequest;
 import com.ussra._blog.posts.entity.Post;
 import com.ussra._blog.posts.repository.*;
 import lombok.RequiredArgsConstructor;
+import java.nio.file.Path;
 
 @Service
 @RequiredArgsConstructor
@@ -21,7 +24,10 @@ public class PostService {
 
     public Post getPostById(Long id) {
         return postRepository.getPostById(id)
-                .orElseThrow(() -> new RuntimeException("Post id does not exist" + id));
+            .orElseThrow(() -> new ResponseStatusException(
+                    HttpStatus.NOT_FOUND,
+                    "Post id does not exist: " + id
+            ));
     }
 
     public Post createPost(CreatePostRequest request, Long userId) throws IOException {
@@ -60,7 +66,9 @@ public class PostService {
         if (request.getDescription() != null && !request.getDescription().isBlank()) {
             post.setDescription(request.getDescription());
         }
-        if (request.getMediaFile() != null && !request.getMediaFile().isEmpty()) {
+        if (request.getMediaFile() == null){
+            // important condition to keep the logic working as it should be 
+        }else if (request.getMediaFile() != null && !request.getMediaFile().isEmpty()) {
             if (request.getMediaFile().getContentType().equals("image/jpeg")
                     || request.getMediaFile().getContentType().equals("image/png")) {
                 String imageUrl = fileStorageService.saveFile(request.getMediaFile());
@@ -71,20 +79,33 @@ public class PostService {
                 post.setMediaUrl(videoUrl);
                 post.setMediaType("VIDEO");
             }
+        } else if (request.getMediaFile().isEmpty()) {
+            String oldImagePath = post.getMediaUrl();
+            if (oldImagePath != null) {
+            Path path = Paths.get(oldImagePath);
+                try {
+                    Files.deleteIfExists(path);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+            System.out.println("999999999999999999999999");
+            post.setMediaUrl(null);
+            post.setMediaType(null);
         }
+
         return postRepository.save(post);
     }
 
-    public void deletePost(Long id, Long userId){
+    public void deletePost(Long id, Long userId) {
         Post post = getPostById(id);
 
-        if (!post.getUserId().equals(userId)){
+        if (!post.getUserId().equals(userId)) {
             throw new ResponseStatusException(
                     HttpStatus.FORBIDDEN,
                     "You are not the owner of this post.");
         }
         postRepository.delete(post);
     }
-
 
 }

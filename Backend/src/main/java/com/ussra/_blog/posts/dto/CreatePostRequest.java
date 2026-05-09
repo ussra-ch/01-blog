@@ -2,7 +2,7 @@ package com.ussra._blog.posts.dto;
 
 import org.springframework.web.multipart.MultipartFile;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
+// import jakarta.validation.constraints.NotNull;
 
 import lombok.Data;
 
