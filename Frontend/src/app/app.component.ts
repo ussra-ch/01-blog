@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { RouterOutlet, Router } from '@angular/router';
 
 @Component({
   selector: 'app-root',
@@ -8,4 +8,16 @@ import { RouterOutlet } from '@angular/router';
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
-export class AppComponent { }
+export class AppComponent {
+  constructor(private router: Router) {
+    // this.router.events.subscribe(event => {
+    //   console.log(event);
+    // });
+    console.log("1111111111111")
+  }
+
+  ngOnInit(): void {
+    console.log("AppComponent ngOnInit");
+  }
+
+}

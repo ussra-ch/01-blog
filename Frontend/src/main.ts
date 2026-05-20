@@ -3,4 +3,9 @@ import { appConfig } from './app/app.config';
 import { AppComponent } from './app/app.component';
 
 bootstrapApplication(AppComponent, appConfig)
-  .catch((err) => console.error(err));
+  .then(() => {
+    console.log("main.ts works");
+  })
+  .catch((err) => {
+    console.error("Bootstrap error:", err);
+  });

@@ -15,6 +15,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import java.io.IOException;
+import jakarta.servlet.http.Cookie;
 
 @Component
 @RequiredArgsConstructor
@@ -27,14 +28,26 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
 
         System.out.println("yousraaaaaaaaa");
-        final String authHeader = request.getHeader("Authorization");
+        Cookie[] data = request.getCookies();
+        String authHeader = null;
+        if (data != null){
+            for (Cookie cookie : data){
+                if (cookie.getName().equals("auth_token")){
+                    authHeader = cookie.getValue();
+                }
+            }
+        }
 
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+        // if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+        //     filterChain.doFilter(request, response);
+        //     return;
+        // }
+
+        final String jwt = authHeader;
+        if (jwt == null || jwt.isEmpty()){
             filterChain.doFilter(request, response);
             return;
         }
-
-        final String jwt = authHeader.substring(7);
         final String username = jwtService.extractUsername(jwt);
 
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {

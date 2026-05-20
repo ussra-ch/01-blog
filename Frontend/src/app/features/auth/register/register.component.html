@@ -1,46 +1,47 @@
-<div class="min-h-screen flex items-center justify-center bg-gray-50 px-4 py-12">
-  <div class="max-w-md w-full space-y-8 bg-white p-10 rounded-2xl shadow-xl border border-gray-100">
-    <div class="text-center">
-      <h2 class="text-3xl font-bold text-indigo-600">Join 01Blog</h2>
-      <p class="mt-2 text-gray-500">Create your account to start sharing</p>
+<div class="min-vh-100 d-flex align-items-center justify-content-center bg-light px-3 py-5">
+  <div class="card shadow-lg p-4" style="max-width: 450px; width: 100%;">
+
+    <div class="text-center mb-4">
+      <h2 class="fw-bold text-primary">Join 01Blog</h2>
+      <p class="text-muted">Create your account to start sharing</p>
     </div>
 
-    <form [formGroup]="registerForm" (ngSubmit)="onRegister()" class="space-y-5">
+    <form [formGroup]="registerForm" (ngSubmit)="onRegister()">
 
-      <div>
-        <label class="block text-sm font-semibold text-gray-700">Username</label>
-        <input formControlName="username" type="text"
-          class="mt-1 block w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-400 focus:border-transparent outline-none transition">
+      <div class="mb-3">
+        <label class="form-label fw-semibold">Username</label>
+        <input formControlName="username" type="text" class="form-control">
       </div>
 
-      <div>
-        <label class="block text-sm font-semibold text-gray-700">Email</label>
-        <input formControlName="email" type="email"
-          class="mt-1 block w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-400 focus:border-transparent outline-none transition">
+      <div class="mb-3">
+        <label class="form-label fw-semibold">Email</label>
+        <input formControlName="email" type="email" class="form-control">
       </div>
 
-      <div>
-        <label class="block text-sm font-semibold text-gray-700">Bio</label>
-        <input formControlName="bio" type="bio"
-          class="mt-1 block w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-400 focus:border-transparent outline-none transition">
+      <div class="mb-3">
+        <label class="form-label fw-semibold">Bio</label>
+        <textarea formControlName="bio" class="form-control" rows="3"></textarea>
       </div>
 
-      <div>
-        <label class="block text-sm font-semibold text-gray-700">Password</label>
-        <input formControlName="password" type="password"
-          class="mt-1 block w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-400 focus:border-transparent outline-none transition">
+      <div class="mb-3">
+        <label class="form-label fw-semibold">Password</label>
+        <input formControlName="password" type="password" class="form-control">
       </div>
-      <input type="file" (change)="onFileSelected($event)" accept="image/*">
 
-      <button type="submit" [disabled]="registerForm.invalid"
-        class="w-full py-3 px-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-lg shadow-md hover:shadow-lg transition duration-200 disabled:bg-gray-400">
+      <div class="mb-4">
+        <label class="form-label fw-semibold">Profile Picture</label>
+        <input type="file" class="form-control" (change)="onFileSelected($event)" accept="image/*">
+      </div>
+
+      <button type="submit" [disabled]="registerForm.invalid" class="btn btn-primary w-100 py-2 fw-bold">
         Register
       </button>
 
     </form>
 
     <div class="text-center mt-4">
-      <a routerLink="/login" class="text-sm text-indigo-600 hover:underline">Already have an account? Login</a>
+      <a routerLink="/login" class="text-primary small">Already have an account? Login</a>
     </div>
+
   </div>
 </div>

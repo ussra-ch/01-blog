@@ -3,13 +3,19 @@ package com.ussra._blog.Authentication;
 import com.ussra._blog.User.User;
 import com.ussra._blog.User.UserPrincipal;
 import com.ussra._blog.User.UserRepository;
+import com.ussra._blog.Authentication.AuthResponse;
 
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.http.ResponseCookie;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import java.io.IOException;
+import org.springframework.http.HttpHeaders;
+// import com.example.demo.auth.AuthResponse;
 
 @Service
 @RequiredArgsConstructor
@@ -32,7 +38,8 @@ public class AuthService {
         user.setRole("USER");
 
         if (request.getAvatar() != null && !request.getAvatar().isEmpty()) {
-            if (request.getAvatar().getContentType().equals("image/jpeg") || request.getAvatar().getContentType().equals("image/png")){
+            if (request.getAvatar().getContentType().equals("image/jpeg")
+                    || request.getAvatar().getContentType().equals("image/png")) {
                 String avatarUrl = fileStorageService.saveFile(request.getAvatar());
                 user.setAvatarUrl(avatarUrl);
             }
@@ -54,6 +61,7 @@ public class AuthService {
                 .orElseThrow();
         UserPrincipal userPrincipal = new UserPrincipal(user);
         String token = jwtService.generateToken(userPrincipal);
+
         return new AuthResponse(token, jwtService.getJwtExpiration());
     }
 }

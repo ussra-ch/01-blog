@@ -33,4 +33,14 @@ export class LoginComponent {
       });
     }
   }
+
+  next() {
+      console.log("login success");
+
+      this.router.navigate(['/feed']).then(result => {
+        console.log("navigation result:", result);
+        console.log("current url:", this.router.url);
+      });
+
+    }
 }
