@@ -1,17 +1,17 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { FeedComponent } from './feed.component';
+import { CreatePost } from './create-post';
 
-describe('Feed', () => {
-  let component: FeedComponent;
-  let fixture: ComponentFixture<FeedComponent>;
+describe('CreatePost', () => {
+  let component: CreatePost;
+  let fixture: ComponentFixture<CreatePost>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [FeedComponent],
+      imports: [CreatePost],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(FeedComponent);
+    fixture = TestBed.createComponent(CreatePost);
     component = fixture.componentInstance;
     await fixture.whenStable();
   });

@@ -10,17 +10,22 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.ussra._blog.Authentication.FileStorageService;
 import com.ussra._blog.posts.dto.CreatePostRequest;
+import com.ussra._blog.posts.dto.FeedPostResponse;
 import com.ussra._blog.posts.dto.UpdatePostRequest;
+import com.ussra._blog.posts.dto.UserSummaryResponse;
 import com.ussra._blog.posts.entity.Post;
+import com.ussra._blog.User.UserRepository;
 import com.ussra._blog.posts.repository.*;
 import lombok.RequiredArgsConstructor;
 import java.nio.file.Path;
-
+import java.util.List;
+import com.ussra._blog.User.User;
 @Service
 @RequiredArgsConstructor
 public class PostService {
     private final PostRepository postRepository;
     private final FileStorageService fileStorageService;
+    private final UserRepository userRepository;
 
     public Post getPostById(Long id) {
         return postRepository.getPostById(id)
@@ -108,4 +113,41 @@ public class PostService {
         postRepository.delete(post);
     }
 
+    public List<FeedPostResponse> getFeedPosts(Long currentUserId) {
+        // System.out.println("befooooooooore");
+        List<Post> posts = postRepository.getFeedPosts(currentUserId);
+        // System.out.println("afteeeeeeeeeer");
+        // System.out.println("afteeeeeeeeeer :::");
+        // System.out.println(posts);
+        return posts.stream()
+                .map(post -> mapToFeedResponse(post, currentUserId))
+                .toList();
+    }
+    private FeedPostResponse mapToFeedResponse(Post post, Long currentUserId) {
+            FeedPostResponse response = new FeedPostResponse();
+            response.setPostId(post.getId());
+            response.setDescription(post.getDescription());
+            response.setMediaUrl(post.getMediaUrl());
+            response.setCreatedAt(post.getCreatedAt());
+            response.setTitle(post.getTitle());
+            // response.setLikeCount(post.getLikes().size());
+            // response.setCommentCount(post.getComments().size());
+            // response.setLikedByCurrentUser(
+            //     post.getLikes()
+            //         .stream()
+            //         .anyMatch(like -> like.getUser().getId().equals(currentUserId))
+            // );
+            User user = userRepository.findById(post.getUserId())
+                        .orElseThrow();
+
+            UserSummaryResponse author = new UserSummaryResponse();
+            author.setId(user.getId());
+            author.setUsername(user.getUsername());
+            // author.setProfilePicture(post.getAuthor(user.getProfilePicture()));
+            response.setAuthor(author);
+            // System.out.println("response size = " + response.size());
+            // System.out.println("------------------------------");
+            // System.out.println("response is : " +  response);
+            return response;
+        }
 }

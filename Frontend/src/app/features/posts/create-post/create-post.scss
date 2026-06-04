@@ -1,0 +1,59 @@
+.create-post-page {
+  min-height: 100vh;
+  background: #f5f7fb;
+  display: flex;
+  justify-content: center;
+  padding: 40px 20px;
+}
+
+.create-post-card {
+  width: 100%;
+  max-width: 800px;
+  background: white;
+  border-radius: 20px;
+  padding: 32px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+}
+
+h1 {
+  margin-bottom: 24px;
+  font-size: 32px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 20px;
+}
+
+label {
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+input,
+textarea {
+  border: 1px solid #dcdfe4;
+  border-radius: 12px;
+  padding: 14px;
+  font-size: 16px;
+}
+
+textarea {
+  resize: vertical;
+}
+
+button {
+  border: none;
+  background: black;
+  color: white;
+  padding: 14px 20px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

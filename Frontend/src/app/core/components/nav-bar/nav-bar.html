@@ -1,0 +1,109 @@
+<nav class="navbar-moroccan">
+  <div class="navbar-content">
+
+    <!-- Logo -->
+    <a routerLink="/" class="navbar-brand">
+      <img
+        src="/stoun.png"
+        alt="01Blog Logo"
+        class="navbar-logo"
+      />
+    </a>
+
+    <!-- Center navigation -->
+    <div class="nav-center">
+      <a
+          routerLink="/"
+          routerLinkActive="active"
+          [routerLinkActiveOptions]="{ exact: true }"
+          class="nav-link"
+        >
+          Feed
+        </a>
+
+        <a
+          routerLink="/create-post"
+          routerLinkActive="active"
+          class="nav-link"
+        >
+          Write
+        </a>
+    </div>
+
+    <!-- Right actions -->
+    <div class="nav-actions">
+
+      <!-- Search -->
+      <button class="btn-icon" title="Search">
+        <svg
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <circle cx="11" cy="11" r="8"></circle>
+          <path d="m21 21-4.35-4.35"></path>
+        </svg>
+      </button>
+
+      <!-- Notifs -->
+      <button class="btn-icon" title="Notifications">
+      <svg
+        width="20"
+        height="20"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <path d="M15 17h5l-1.4-1.4A2 2 0 0 1 18 14.2V11a6 6 0 1 0-12 0v3.2a2 2 0 0 1-.6 1.4L4 17h5"></path>
+        <path d="M9 17a3 3 0 0 0 6 0"></path>
+      </svg>
+    </button>
+
+      <!-- Profile -->
+      <div class="dropdown">
+        <button
+          class="btn-profile"
+          data-bs-toggle="dropdown"
+        >
+          <img
+            src="profile.png"
+            alt="Profile"
+            class="profile-avatar"
+          />
+        </button>
+
+        <ul class="dropdown-menu dropdown-menu-end moroccan-dropdown">
+          <li>
+            <a class="dropdown-item" routerLink="/profile">
+              Profile
+            </a>
+          </li>
+
+          <li>
+            <a class="dropdown-item" routerLink="/settings">
+              Settings
+            </a>
+          </li>
+
+          <li>
+            <hr class="dropdown-divider">
+          </li>
+
+          <li>
+            <button class="dropdown-item">
+              Logout
+            </button>
+          </li>
+
+        </ul>
+      </div>
+
+    </div>
+  </div>
+</nav>

@@ -25,3 +25,22 @@ body {
   margin: 0;
   height: 100%;
 }
+
+/* Moroccan Color Palette - Traditional & Scholarly */
+:root {
+  --terracotta: #C05621;
+  --cobalt: #2B5F75;
+  --saffron: #E8A735;
+  --olive: #7A8450;
+  --cream: #F5F0E8;
+
+  --deep-red: #8B2E2E;
+  --teal: #1A7A7A;
+  --gold: #B8860B;
+
+  --parchment: #FAF7F2;
+  --ink: #2C2416;
+  --shadow: rgba(44, 36, 22, 0.1);
+
+  --zelij-gradient: linear-gradient(135deg, var(--terracotta) 0%, var(--cobalt) 100%);
+}

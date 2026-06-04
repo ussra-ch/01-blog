@@ -1,0 +1,53 @@
+<app-nav-bar></app-nav-bar>
+<div class="create-post-page">
+  <div class="create-post-card">
+
+    <h1>Create Post</h1>
+
+    <form [formGroup]="postForm" (ngSubmit)="onSubmit()">
+
+      <!-- TITLE -->
+      <div class="form-group">
+        <label>Title</label>
+
+        <input
+          type="text"
+          formControlName="title"
+          placeholder="Enter post title"
+        />
+      </div>
+
+      <!-- CONTENT -->
+      <div class="form-group">
+        <label>Content</label>
+
+        <textarea
+          rows="10"
+          formControlName="content"
+          placeholder="Write your post..."
+        ></textarea>
+      </div>
+
+      <!-- IMAGE -->
+      <div class="form-group">
+        <label>Cover Image</label>
+
+        <input
+          type="file"
+          (change)="onFileSelected($event)"
+        />
+      </div>
+
+      <!-- BUTTON -->
+      <button
+        type="submit"
+        [disabled]="postForm.invalid || loading"
+      >
+        {{ loading ? 'Publishing...' : 'Publish Post' }}
+      </button>
+
+    </form>
+
+  </div>
+
+</div>

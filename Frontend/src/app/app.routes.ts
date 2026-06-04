@@ -4,6 +4,7 @@ import { RegisterComponent } from './features/auth/register/register.component';
 // import { FeedComponent } from './features/posts/feed/feed.component';
 import { authGuard } from './core/guards/auth-guard';
 import { guestGuard } from './core/guards/guest-guard';
+import {CreatePostComponent} from './features/posts/create-post/create-post';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent, canActivate: [guestGuard] },
@@ -14,5 +15,9 @@ export const routes: Routes = [
     canActivate: [authGuard],
     loadComponent: () => import('./features/posts/feed/feed.component').then(m => m.FeedComponent)
   },
-  { path: '', redirectTo: 'login', pathMatch: 'full' }
+  { path: '', redirectTo: 'login', pathMatch: 'full' },
+  {
+    path: 'create-post',
+    component: CreatePostComponent
+  }
 ];
