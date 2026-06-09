@@ -13,7 +13,7 @@ export class AppComponent {
     // this.router.events.subscribe(event => {
     //   console.log(event);
     // });
-    console.log("1111111111111")
+    // console.log("")
   }
 
   ngOnInit(): void {

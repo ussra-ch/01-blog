@@ -11,14 +11,14 @@ export const authGuard: CanActivateFn = () => {
   if (!isPlatformBrowser(platformId)) {
     return true;
   }
-  console.log("guard called");
+  // console.log("guard called");
   const authService = inject(AuthService);
   const router = inject(Router);
 
   return authService.isLoggedIn().pipe(
 
       map(() => {
-        console.log("guard allows access");
+        // console.log("guard allows access");
         return true;
       }),
 

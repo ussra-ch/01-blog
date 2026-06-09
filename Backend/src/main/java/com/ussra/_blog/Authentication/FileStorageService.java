@@ -8,12 +8,35 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.UUID;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import javax.imageio.ImageIO;
 
 @Service
 public class FileStorageService {
 
     @Value("${file.upload-dir}")
     private String uploadDir;
+
+    private void resizeAndSave(Path targetPath, int maxWidth) throws IOException {
+        BufferedImage original = ImageIO.read(targetPath.toFile());
+        if (original == null || original.getWidth() <= maxWidth) return; // already small enough
+
+        int newHeight = (int) ((double) original.getHeight() / original.getWidth() * maxWidth);
+        BufferedImage resized = new BufferedImage(maxWidth, newHeight, BufferedImage.TYPE_INT_RGB);
+
+        Graphics2D g = resized.createGraphics();
+        g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+        g.drawImage(original, 0, 0, maxWidth, newHeight, null);
+        g.dispose();
+
+        String filename = targetPath.getFileName().toString();
+        String ext = filename.substring(filename.lastIndexOf('.') + 1).toLowerCase();
+        String format = ext.equals("jpg") ? "jpeg" : ext;
+
+        ImageIO.write(resized, format, targetPath.toFile());
+    }
+
 
     public String saveFile(MultipartFile file) throws IOException {
         Path uploadPath = Paths.get(uploadDir);
@@ -25,6 +48,7 @@ public class FileStorageService {
         String filename = UUID.randomUUID() + "_" + file.getOriginalFilename();
         Path filePath = uploadPath.resolve(filename);
         Files.copy(file.getInputStream(), filePath);
+        resizeAndSave(filePath, 1200);
 
         return filePath.toString();
     }

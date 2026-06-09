@@ -1,61 +1,56 @@
-import { Component, Input, Output, EventEmitter, inject } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Post } from '../../../core/models/post';
-import { PostService } from '../../../core/services/post';
+import { Router } from '@angular/router';
+import { Output, EventEmitter } from '@angular/core';
 import { AuthService } from '../../../core/services/auth.service';
+import { inject } from '@angular/core';
+import { Post } from '../../../core/models/post';
+
+
+export interface UserSummary {
+  id: number;
+  username: string;
+  profilePicture?: string | null;
+}
+
 
 @Component({
   selector: 'app-post-card',
   standalone: true,
   imports: [CommonModule],
   templateUrl: './post-card.html',
-  styleUrl: './post-card.scss'
+  styleUrls: ['./post-card.scss']
 })
 export class PostCardComponent {
+  @Output() openPost = new EventEmitter<Post>();
   @Input() post!: Post;
-  @Output() edited = new EventEmitter<number>();
-  @Output() deleted = new EventEmitter<number>();
-  @Output() commented = new EventEmitter<number>();
+  @Output() editPost = new EventEmitter<Post>();
+  @Output() deletePost = new EventEmitter<Post>();
 
-  private  postService = inject(PostService);
+  constructor(private router: Router) {}
   private authService = inject(AuthService);
 
-  get isOwnPost(): boolean {
-    const currentUser = this.authService.currentUser();
-    return currentUser ? currentUser.username === this.post.author.username : false;
+  get formattedDate(): string {
+    return new Date(this.post.createdAt).toLocaleString('en-US', {
+      month: 'long',
+      day: 'numeric',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
   }
 
-  isVideo(): boolean {
-    return this.post.mediaUrl?.toLowerCase().includes('video') ||
-           this.post.mediaUrl?.toLowerCase().endsWith('.mp4') ||
-           false;
+  get authorInitial(): string {
+    return this.post.author?.username?.charAt(0)?.toUpperCase() ?? '?';
   }
 
-
-  toggleLike() {
-    console.log('Like functionality not implemented yet');
-    // Will implement later
+  get isOwner(): boolean {
+    const id = this.authService.currentUserId;
+    // console.log("INSIDE isOwner ->", id);
+    // console.log("AUTH SERVICE INSTANCE ->", this.authService);
+    return id === this.post.author.id;
   }
 
-  onEdit() {
-    this.edited.emit(this.post.id);
-  }
-
-  onDelete() {
-    if (confirm('Are you sure you want to delete this post?')) {
-      this.postService.deletePost(this.post.id).subscribe({
-        next: () => {
-          this.deleted.emit(this.post.id);
-        },
-        error: (err) => {
-          console.error('Failed to delete post', err);
-        }
-      });
-    }
-  }
-
-  onComment() {
-    console.log('Comment functionality not implemented yet');
-    this.commented.emit(this.post.id);
-  }
+  upvotes = 0;
+  comments = 0;
 }

@@ -13,6 +13,7 @@ public class FeedPostResponse {
     private LocalDateTime createdAt;
     private int likeCount;
     private int commentCount;
+    private String[] comments;
     private boolean likedByCurrentUser;
     private UserSummaryResponse author;
 }

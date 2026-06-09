@@ -51,7 +51,7 @@ export class CreatePostComponent {
       this.postForm.value.content!
     );
     if (this.selectedFile) {
-      formData.append('image', this.selectedFile);
+      formData.append('mediaFile', this.selectedFile);
     }
     // console.log("description:", this.postForm.value.content);
 

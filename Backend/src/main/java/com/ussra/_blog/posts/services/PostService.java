@@ -3,6 +3,7 @@ package com.ussra._blog.posts.services;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -19,6 +20,9 @@ import com.ussra._blog.posts.repository.*;
 import lombok.RequiredArgsConstructor;
 import java.nio.file.Path;
 import java.util.List;
+import javax.imageio.ImageIO;
+
+
 import com.ussra._blog.User.User;
 @Service
 @RequiredArgsConstructor
@@ -35,11 +39,13 @@ public class PostService {
             ));
     }
 
+    
     public Post createPost(CreatePostRequest request, Long userId) throws IOException {
         // title, description, image
         Post post = new Post();
         post.setTitle(request.getTitle());
         post.setDescription(request.getDescription());
+        System.out.println("MEDIAAA FILE IS : " + request.getMediaFile());
 
         if (request.getMediaFile() != null && !request.getMediaFile().isEmpty()) {
             if (request.getMediaFile().getContentType().equals("image/jpeg")
@@ -130,24 +136,15 @@ public class PostService {
             response.setMediaUrl(post.getMediaUrl());
             response.setCreatedAt(post.getCreatedAt());
             response.setTitle(post.getTitle());
-            // response.setLikeCount(post.getLikes().size());
-            // response.setCommentCount(post.getComments().size());
-            // response.setLikedByCurrentUser(
-            //     post.getLikes()
-            //         .stream()
-            //         .anyMatch(like -> like.getUser().getId().equals(currentUserId))
-            // );
             User user = userRepository.findById(post.getUserId())
                         .orElseThrow();
-
             UserSummaryResponse author = new UserSummaryResponse();
             author.setId(user.getId());
             author.setUsername(user.getUsername());
             // author.setProfilePicture(post.getAuthor(user.getProfilePicture()));
             response.setAuthor(author);
-            // System.out.println("response size = " + response.size());
-            // System.out.println("------------------------------");
-            // System.out.println("response is : " +  response);
+            response.setLikeCount(0);
+            response.setComments(new String[0]);
             return response;
         }
 }

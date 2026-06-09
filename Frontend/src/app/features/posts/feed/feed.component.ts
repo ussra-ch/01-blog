@@ -3,6 +3,7 @@ import { NavBar } from '../../../core/components/nav-bar/nav-bar';
 import { PostCardComponent } from '../../posts/post-card/post-card';
 import { PostService } from '../../../core/services/post';
 import { Post } from '../../../core/models/post';
+import { SinglePost} from '../single-post/single-post'
 import { CommonModule } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { PaginatedResponse } from '../../../core/models/paginated-response';
@@ -10,9 +11,9 @@ import { PaginatedResponse } from '../../../core/models/paginated-response';
 @Component({
   selector: 'app-feed',
   standalone: true,
-  imports: [CommonModule, NavBar, PostCardComponent],
+  imports: [CommonModule, NavBar, PostCardComponent, SinglePost],
   templateUrl: './feed.component.html',
-  styleUrls: ['./feed.component.scss']
+  styleUrls: ['./feed.component.scss'],
 })
 export class FeedComponent implements OnInit {
   @ViewChild('scrollTrigger') scrollTrigger!: ElementRef;
@@ -21,6 +22,7 @@ export class FeedComponent implements OnInit {
 
   posts = signal<Post[]>([]);
   loading = signal(false);
+  selectedPost: Post | null = null;
   private page = 0;
   private pageSize = 10;
 
@@ -33,6 +35,8 @@ export class FeedComponent implements OnInit {
     this.loading.set(true);
     this.postService.getPosts(this.page, this.pageSize).subscribe({
       next: (response: Post[]) => {
+        // console.log("response is :::::");
+        // console.log(response);
         this.posts.update(prev => [...prev, ...response]);
         this.page++;
         this.loading.set(false);
@@ -44,6 +48,9 @@ export class FeedComponent implements OnInit {
     });
   }
 
+  onCommentAdded(comment: any): void {
+    console.log("commentsssss");
+  }
   private setupInfiniteScroll() {
     setTimeout(() => {
       if (this.scrollTrigger?.nativeElement) {
@@ -63,8 +70,18 @@ export class FeedComponent implements OnInit {
     // Navigate to edit page later
   }
 
-  onDeletePost(postId: number) {
-    this.posts.update(prev => prev.filter(p => p.id !== postId));
+  onDeletePost(post: Post): void {
+    this.postService.deletePost(post.postId).subscribe({
+        next: () => {
+          this.posts.update(prev =>
+            prev.filter(p => p.postId !== post.postId)
+          );
+        },
+        error: err => {
+          console.error("Delete failed:", err);
+        }
+      });
+
   }
 
   onCommentPost(postId: number) {

@@ -1,67 +1,86 @@
-<div class="card post-card shadow-sm">
-  <!-- Post Header -->
-  <div class="card-body pb-0">
-    <div class="d-flex justify-content-between align-items-start mb-3">
-      <div class="d-flex gap-3 flex-grow-1">
-        <img [src]="post.author.profilePicture || 'https://via.placeholder.com/48'"
-             alt="Profile" class="rounded-circle" width="48" height="48" style="object-fit: cover;">
-        <div>
-          <h6 class="mb-0 fw-600">{{ post.author.username }}</h6>
-          <small class="text-muted">{{ post.createdAt | date: 'short' }}</small>
-        </div>
+<div class="post-card d-flex gap-3 align-items-start" (click)="openPost.emit(post)">
+
+  <!-- Vote / Comment Actions -->
+  <div class="post-actions d-flex flex-column align-items-center gap-2">
+    <button class="action-btn" title="Upvote">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none"
+        viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7" />
+      </svg>
+      <span class="action-count">{{ upvotes }}</span>
+    </button>
+
+    <button class="action-btn" title="Comments">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none"
+        viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round"
+          d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+      </svg>
+      <span class="action-count">{{ comments }}</span>
+    </button>
+  </div>
+
+  <!-- Post Body -->
+  <div class="post-body flex-grow-1 min-w-0">
+
+    <!-- Author -->
+    <div class="post-author d-flex align-items-center gap-2 mb-2">
+      <div class="avatar" *ngIf="!post.author.profilePicture">
+        {{ authorInitial }}
       </div>
-      <div class="dropdown" *ngIf="isOwnPost">
-        <button class="btn btn-link btn-sm text-secondary p-0" data-bs-toggle="dropdown">
-          <i class="bi bi-three-dots-vertical"></i>
-        </button>
-        <ul class="dropdown-menu dropdown-menu-end">
-          <li><a class="dropdown-item" href="#" (click)="onEdit(); $event.preventDefault()">Edit</a></li>
-          <li><a class="dropdown-item text-danger" href="#" (click)="onDelete(); $event.preventDefault()">Delete</a></li>
-        </ul>
-      </div>
+      <img *ngIf="post.author.profilePicture"
+        [src]="post.author.profilePicture"
+        [alt]="post.author.username"
+        class="avatar-img" />
+      <span class="author-name">{{ post.author.username }}</span>
     </div>
 
-    <!-- Post Content -->
-    <h5 class="card-title fw-700">{{ post.title }}</h5>
-    <p class="card-text text-muted" *ngIf="post.description">{{ post.description }}</p>
-  </div>
+    <!-- Title -->
+    <h2 class="post-title">{{ post.title }}</h2>
 
-  <!-- Media -->
-  <div *ngIf="post.mediaUrl" class="card-img-container">
-    <img *ngIf="!isVideo()" [src]="post.mediaUrl" alt="Post media" class="card-img">
-    <video *ngIf="isVideo()" controls class="card-img w-100" style="object-fit: cover;">
-      <source [src]="post.mediaUrl" type="video/mp4">
-      Your browser doesn't support HTML5 video.
-    </video>
-  </div>
-
-  <!-- Stats & Actions -->
-  <div class="card-footer bg-transparent border-top-0 pt-3 pb-0">
-    <!-- Stats -->
-    <div class="d-flex gap-3 mb-3 small text-muted">
-      <span *ngIf="post.likeCount > 0">
-        <strong>{{ post.likeCount }}</strong> like<span *ngIf="post.likeCount !== 1">s</span>
+    <!-- Meta + Description -->
+    <p class="post-meta mb-1">
+      <!-- <span class="meta-time" [title]="formattedDate">{{ timeAgo }}</span> -->
+      <!-- <span class="meta-dot">·</span>
+      <span>{{ readTime }}</span> -->
+      <span class="meta-dot" *ngIf="post.description">·</span>
+      <span class="post-excerpt" *ngIf="post.description">
+        {{ post.description | slice:0:120 }}{{ post.description.length > 120 ? '…' : '' }}
       </span>
-      <span *ngIf="post.commentCount > 0">
-        <strong>{{ post.commentCount }}</strong> comment<span *ngIf="post.commentCount !== 1">s</span>
-      </span>
-    </div>
+    </p>
 
-    <!-- Action Buttons -->
-    <div class="btn-group w-100" role="group">
-      <button type="button"
-              (click)="toggleLike()"
-              class="btn btn-light btn-sm post-action-btn">
-        Like
-      </button>
-      <button type="button" (click)="onComment()" class="btn btn-light btn-sm post-action-btn">
-        <i class="bi bi-chat"></i>
-        Comment
-      </button>
-      <button type="button" class="btn btn-light btn-sm post-action-btn">
-        <i class="bi bi-share"></i>
-        Share
-      </button>
+    <!-- Timestamp -->
+    <p class="post-timestamp mt-2">
+      <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="none"
+        viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" class="me-1">
+        <path stroke-linecap="round" stroke-linejoin="round"
+          d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+      {{ formattedDate }}
+    </p>
+  </div>
+
+  <!-- Thumbnail w owner actions -->
+  <div class="d-flex flex-column align-items-end gap-2">
+    <div class="post-thumbnail" *ngIf="post.mediaUrl">
+      <img [src]="'http://localhost:8080/' + post.mediaUrl" [alt]="post.title" />
+    </div>
+    <div class="owner-actions" *ngIf="isOwner">
+      <button class="owner-btn edit" (click)="$event.stopPropagation(); editPost.emit(post)" title="Edit post" >
+      <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="none"
+        viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round"
+          d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+      </svg>
+    </button>
+    <button class="owner-btn delete" (click)="$event.stopPropagation(); deletePost.emit(post)" title="Delete post">
+      <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="none"
+        viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round"
+          d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+      </svg>
+    </button>
     </div>
   </div>
+
 </div>

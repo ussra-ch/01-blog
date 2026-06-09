@@ -13,6 +13,9 @@ export class PostService {
 
   private apiUrl = 'http://localhost:8080/api/posts/feed';
   private createPostRoute = 'http://localhost:8080/api/posts';
+  private deletePostLink = 'http://localhost:8080/api/posts';
+
+  // constructor(private http: HttpClient) {}
 
   getPosts(page: number, size: number): Observable<Post[]> {
     return this.http.get<Post[]>(
@@ -22,9 +25,11 @@ export class PostService {
       }
     );
   }
+
   deletePost(id: number): Observable<void>{
+    console.log("Delete clicked:");
     return this.http.delete<void>(
-      `${this.apiUrl}/${id}`,
+      `${this.deletePostLink}/${id}`,
       { withCredentials: true }
     );
   }
@@ -34,4 +39,13 @@ export class PostService {
       withCredentials: true
     });
   }
+
+  updatePost(id: number, content: string): Observable<Post> {
+    return this.http.put<Post>(
+      `${this.apiUrl}/${id}`,
+      { content },
+      { withCredentials: true }
+    );
+  }
+
 }

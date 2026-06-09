@@ -20,14 +20,14 @@ export class AuthService {
    * Used by AuthGuard
    */
   isLoggedIn() {
-      console.log("isLoggedIn started");
+      // console.log("isLoggedIn started");
       return this.http.get(
         `${this.API_URL}/me`,
         { withCredentials: true }
       ).pipe(
-        tap(() => console.log("me success")),
+        // tap(() => console.log("me success")),
         catchError(err => {
-        console.log("me error", err);
+        // console.log("me error", err);
         return throwError(() => err);
       })
       )
@@ -39,6 +39,22 @@ export class AuthService {
       `${this.API_URL}/login`,
       credentials,
       { withCredentials: true }
+    ).pipe(
+      tap(response => {
+        console.log("LOGIN RESPONSE:", response);
+
+        localStorage.setItem(
+          "user_data",
+          JSON.stringify(response)
+        );
+
+        console.log(
+          "AFTER SAVE:",
+          localStorage.getItem("user_data")
+        );
+
+        this.currentUser.set(response);
+      })
     );
   }
 
@@ -51,16 +67,38 @@ export class AuthService {
   }
 
   register(userData: any) {
-    // console.log("hnaaaaa 1:")
-    // console.log(userData)
-    return this.http.post(`${this.API_URL}/register`, userData);
+    return this.http.post<AuthResponse>(
+      `${this.API_URL}/register`,
+      userData,
+      { withCredentials: true }
+    ).pipe(
+      tap(response => {
+        if (isPlatformBrowser(this.platformId)) {
+          localStorage.setItem(
+            'user_data',
+            JSON.stringify(response)
+          );
+        }
+
+        this.currentUser.set(response);
+      })
+    );
   }
 
-  private getUserFromStorage(): AuthResponse | null {
+  public getUserFromStorage(): AuthResponse | null {
     if (isPlatformBrowser(this.platformId)) {
       const data = localStorage.getItem('user_data');
       return data ? JSON.parse(data) : null;
     }
     return null;
   }
+
+  get currentUserId(): number | null {
+    const id = this.getUserFromStorage()?.id ?? null;
+
+    // console.log("GETTER EXECUTED ->", id);
+
+    return id;
+  }
+
 }
