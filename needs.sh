@@ -239,3 +239,9 @@ echo ""
 # source ~/.bashrc
 
 #./mvnw spring-boot:run
+
+####### this is how we create the database
+# run inside container, connect to 'postgres' DB explicitly
+# docker exec -it mydb psql -U 01blog -d postgres -c "CREATE DATABASE mydb OWNER \"01blog\";"
+# verify
+# PGPASSWORD=01blog psql -h localhost -p 5431 -U 01blog -d mydb -c "SELECT 1;"

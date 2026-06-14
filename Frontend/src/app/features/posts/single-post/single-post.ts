@@ -1,19 +1,8 @@
 import { Component, Input, Output, EventEmitter, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Post } from '../../../core/models/post';
-
-export interface Comment {
-  commentId: number;
-  content: string;
-  createdAt: string | Date;
-  author: {
-    id: number;
-    username: string;
-    profilePicture?: string;
-  };
-}
+import { Comment, Post } from '../../../core/models/post';
+import { PostService } from '../../../core/services/post';
 
 @Component({
   selector: 'app-single-post',
@@ -28,15 +17,21 @@ export class SinglePost implements OnInit {
   @Output() closed = new EventEmitter<void>();
   @Output() commentAdded = new EventEmitter<Comment>();
 
-  private http = inject(HttpClient);
+  private postService = inject(PostService);
 
   newComment = '';
+  comments: Comment[] = [];
+  loadingComments = false;
   submitting = false;
+  liking = false;
   liked = false;
   localLikes = 0;
 
   ngOnInit() {
     this.localLikes = this.post.likeCount ?? 0;
+    this.liked = this.post.likedByCurrentUser ?? false;
+    this.comments = this.post.comments ?? [];
+    this.loadComments();
     document.body.style.overflow = 'hidden';
   }
 
@@ -52,26 +47,68 @@ export class SinglePost implements OnInit {
   }
 
   toggleLike() {
-    this.liked = !this.liked;
-    this.localLikes += this.liked ? 1 : -1;
+    if (this.liking) return;
+
+    const previousLiked = this.liked;
+    const previousLikeCount = this.localLikes;
+    const nextLiked = !previousLiked;
+
+    this.liked = nextLiked;
+    this.localLikes = Math.max(0, previousLikeCount + (nextLiked ? 1 : -1));
+    this.post.likedByCurrentUser = nextLiked;
+    this.post.likeCount = this.localLikes;
+    this.liking = true;
+
+    this.postService.toggleLike(this.post.postId).subscribe({
+      next: (response) => {
+        this.liked = response.likedByCurrentUser;
+        this.localLikes = response.likeCount;
+        this.post.likedByCurrentUser = response.likedByCurrentUser;
+        this.post.likeCount = response.likeCount;
+        this.liking = false;
+      },
+      error: () => {
+        this.liked = previousLiked;
+        this.localLikes = previousLikeCount;
+        this.post.likedByCurrentUser = previousLiked;
+        this.post.likeCount = previousLikeCount;
+        this.liking = false;
+      }
+    });
   }
 
   submitComment() {
-    if (!this.newComment.trim() || this.submitting) return;
+    const content = this.newComment.trim();
+    if (!content || this.submitting) return;
+
     this.submitting = true;
 
-    // Replace with your actual API endpoint & auth headers
-    this.http.post<Comment>(`/api/posts/${this.post.postId}/comments`, {
-      content: this.newComment.trim()
-    }).subscribe({
+    this.postService.addComment(this.post.postId, { content }).subscribe({
       next: (comment) => {
-        // this.post.comments = [...(this.post.comments ?? []), comment];
+        this.comments = [...this.comments, comment];
+        this.post.comments = this.comments;
+        this.post.commentCount = (this.post.commentCount ?? 0) + 1;
         this.commentAdded.emit(comment);
         this.newComment = '';
         this.submitting = false;
       },
       error: () => {
         this.submitting = false;
+      }
+    });
+  }
+
+  private loadComments(): void {
+    this.loadingComments = true;
+    this.postService.getComments(this.post.postId).subscribe({
+      next: (comments) => {
+        this.comments = comments;
+        this.post.comments = comments;
+        this.post.commentCount = comments.length;
+        this.loadingComments = false;
+      },
+      error: () => {
+        this.loadingComments = false;
       }
     });
   }

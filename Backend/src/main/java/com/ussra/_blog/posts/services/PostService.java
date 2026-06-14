@@ -10,10 +10,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.ussra._blog.Authentication.FileStorageService;
+import com.ussra._blog.posts.dto.CommentResponse;
+import com.ussra._blog.posts.dto.CreateCommentRequest;
 import com.ussra._blog.posts.dto.CreatePostRequest;
 import com.ussra._blog.posts.dto.FeedPostResponse;
+import com.ussra._blog.posts.dto.PostLikeResponse;
 import com.ussra._blog.posts.dto.UpdatePostRequest;
 import com.ussra._blog.posts.dto.UserSummaryResponse;
+import com.ussra._blog.posts.entity.PostComment;
+import com.ussra._blog.posts.entity.PostLike;
 import com.ussra._blog.posts.entity.Post;
 import com.ussra._blog.User.UserRepository;
 import com.ussra._blog.posts.repository.*;
@@ -21,6 +26,7 @@ import lombok.RequiredArgsConstructor;
 import java.nio.file.Path;
 import java.util.List;
 import javax.imageio.ImageIO;
+import org.springframework.transaction.annotation.Transactional;
 
 
 import com.ussra._blog.User.User;
@@ -28,6 +34,8 @@ import com.ussra._blog.User.User;
 @RequiredArgsConstructor
 public class PostService {
     private final PostRepository postRepository;
+    private final PostLikeRepository postLikeRepository;
+    private final PostCommentRepository postCommentRepository;
     private final FileStorageService fileStorageService;
     private final UserRepository userRepository;
 
@@ -129,6 +137,48 @@ public class PostService {
                 .map(post -> mapToFeedResponse(post, currentUserId))
                 .toList();
     }
+
+    @Transactional
+    public PostLikeResponse toggleLike(Long postId, Long userId) {
+        getPostById(postId);
+
+        boolean likedByCurrentUser;
+        if (postLikeRepository.existsByPostIdAndUserId(postId, userId)) {
+            postLikeRepository.deleteByPostIdAndUserId(postId, userId);
+            likedByCurrentUser = false;
+        } else {
+            PostLike postLike = new PostLike();
+            postLike.setPostId(postId);
+            postLike.setUserId(userId);
+            postLikeRepository.save(postLike);
+            likedByCurrentUser = true;
+        }
+
+        return new PostLikeResponse(
+                postId,
+                postLikeRepository.countByPostId(postId),
+                likedByCurrentUser
+        );
+    }
+
+    public List<CommentResponse> getComments(Long postId) {
+        getPostById(postId);
+        return postCommentRepository.findAllByPostIdOrderByCreatedAtAsc(postId).stream()
+                .map(this::mapToCommentResponse)
+                .toList();
+    }
+
+    public CommentResponse addComment(Long postId, CreateCommentRequest request, Long userId) {
+        getPostById(postId);
+
+        PostComment comment = new PostComment();
+        comment.setPostId(postId);
+        comment.setUserId(userId);
+        comment.setContent(request.getContent().trim());
+
+        return mapToCommentResponse(postCommentRepository.save(comment));
+    }
+
     private FeedPostResponse mapToFeedResponse(Post post, Long currentUserId) {
             FeedPostResponse response = new FeedPostResponse();
             response.setPostId(post.getId());
@@ -143,8 +193,28 @@ public class PostService {
             author.setUsername(user.getUsername());
             // author.setProfilePicture(post.getAuthor(user.getProfilePicture()));
             response.setAuthor(author);
-            response.setLikeCount(0);
+            response.setLikeCount(postLikeRepository.countByPostId(post.getId()));
+            response.setLikedByCurrentUser(postLikeRepository.existsByPostIdAndUserId(post.getId(), currentUserId));
+            response.setCommentCount(postCommentRepository.countByPostId(post.getId()));
             response.setComments(new String[0]);
             return response;
         }
+
+    private CommentResponse mapToCommentResponse(PostComment comment) {
+        User user = userRepository.findById(comment.getUserId())
+                .orElseThrow();
+
+        UserSummaryResponse author = new UserSummaryResponse();
+        author.setId(user.getId());
+        author.setUsername(user.getUsername());
+        author.setProfilePicture(user.getAvatarUrl());
+
+        CommentResponse response = new CommentResponse();
+        response.setCommentId(comment.getId());
+        response.setPostId(comment.getPostId());
+        response.setContent(comment.getContent());
+        response.setCreatedAt(comment.getCreatedAt());
+        response.setAuthor(author);
+        return response;
+    }
 }
