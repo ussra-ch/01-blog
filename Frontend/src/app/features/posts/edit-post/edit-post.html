@@ -1,1 +1,84 @@
-<p>edit-post works!</p>
+<app-nav-bar></app-nav-bar>
+<div class="create-post-page">
+  <div class="create-post-card">
+
+    <h1>Edit Post</h1>
+
+    <div *ngIf="loadingPost" class="loading-message">
+      Loading post...
+    </div>
+
+    <div *ngIf="loadError" class="error-message">
+      {{ loadError }}
+    </div>
+
+    <form *ngIf="!loadingPost" [formGroup]="postForm" (ngSubmit)="onSubmit()">
+
+      <!-- TITLE -->
+      <div class="form-group">
+        <label>Title</label>
+
+        <input
+          type="text"
+          formControlName="title"
+          placeholder="Enter post title"
+        />
+      </div>
+
+      <!-- CONTENT -->
+      <div class="form-group">
+        <label>Content</label>
+
+        <textarea
+          rows="10"
+          formControlName="content"
+          placeholder="Write your post..."
+        ></textarea>
+      </div>
+
+      <!-- CURRENT IMAGE -->
+      <div class="form-group" *ngIf="currentMediaUrl">
+        <label>Current Cover Image</label>
+        <div class="current-cover-wrapper">
+          <img
+            class="current-cover"
+            [src]="'http://localhost:8080/' + currentMediaUrl"
+            alt="Current post cover"
+          />
+          <button
+            type="button"
+            class="remove-media-button"
+            (click)="removeCurrentMedia()"
+          >
+            Remove Image
+          </button>
+        </div>
+      </div>
+
+      <!-- IMAGE -->
+      <div class="form-group">
+        <label>Replace Cover Image</label>
+
+        <input
+          type="file"
+          (change)="onFileSelected($event)"
+        />
+
+        <small class="help-text">
+          {{ removeMedia ? 'The current image will be removed when you save.' : 'Leave empty to keep the current image.' }}
+        </small>
+      </div>
+
+      <!-- BUTTON -->
+      <button
+        type="submit"
+        [disabled]="postForm.invalid || loading"
+      >
+        {{ loading ? 'Saving...' : 'Save Changes' }}
+      </button>
+
+    </form>
+
+  </div>
+
+</div>

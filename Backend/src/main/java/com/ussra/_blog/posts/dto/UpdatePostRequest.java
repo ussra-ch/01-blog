@@ -10,4 +10,5 @@ public class UpdatePostRequest {
     private String description;
     private MultipartFile mediaFile;
     private String mediaType;
+    private boolean removeMedia;
 }

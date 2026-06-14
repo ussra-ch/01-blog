@@ -7,6 +7,7 @@ import { SinglePost} from '../single-post/single-post'
 import { CommonModule } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { PaginatedResponse } from '../../../core/models/paginated-response';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-feed',
@@ -19,6 +20,7 @@ export class FeedComponent implements OnInit {
   @ViewChild('scrollTrigger') scrollTrigger!: ElementRef;
 
   private postService = inject(PostService);
+  private router = inject(Router);
 
   posts = signal<Post[]>([]);
   loading = signal(false);
@@ -65,9 +67,10 @@ export class FeedComponent implements OnInit {
     }, 100);
   }
 
-  onEditPost(postId: number) {
-    console.log('Edit post:', postId);
-    // Navigate to edit page later
+  onEditPost(post: Post) {
+    this.router.navigate(['/edit-post', post.postId], {
+      state: { post }
+    });
   }
 
   onDeletePost(post: Post): void {

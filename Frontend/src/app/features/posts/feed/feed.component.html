@@ -9,7 +9,7 @@
       *ngFor="let post of posts()"
       [post]="post"
       (openPost)="selectedPost = $any($event)"
-      (editPost)="onEditPost($event.postId)"
+      (editPost)="onEditPost($event)"
       (deletePost)="onDeletePost($event)">
     </app-post-card>
 

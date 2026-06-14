@@ -1,9 +1,6 @@
 package com.ussra._blog.posts.services;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -23,9 +20,7 @@ import com.ussra._blog.posts.entity.Post;
 import com.ussra._blog.User.UserRepository;
 import com.ussra._blog.posts.repository.*;
 import lombok.RequiredArgsConstructor;
-import java.nio.file.Path;
 import java.util.List;
-import javax.imageio.ImageIO;
 import org.springframework.transaction.annotation.Transactional;
 
 
@@ -85,9 +80,13 @@ public class PostService {
         if (request.getDescription() != null && !request.getDescription().isBlank()) {
             post.setDescription(request.getDescription());
         }
-        if (request.getMediaFile() == null){
-            // important condition to keep the logic working as it should be 
-        }else if (request.getMediaFile() != null && !request.getMediaFile().isEmpty()) {
+        if (request.isRemoveMedia()) {
+            fileStorageService.deleteFile(post.getMediaUrl());
+            post.setMediaUrl(null);
+            post.setMediaType(null);
+        } else if (request.getMediaFile() != null && !request.getMediaFile().isEmpty()) {
+            String oldMediaUrl = post.getMediaUrl();
+
             if (request.getMediaFile().getContentType().equals("image/jpeg")
                     || request.getMediaFile().getContentType().equals("image/png")) {
                 String imageUrl = fileStorageService.saveFile(request.getMediaFile());
@@ -98,19 +97,10 @@ public class PostService {
                 post.setMediaUrl(videoUrl);
                 post.setMediaType("VIDEO");
             }
-        } else if (request.getMediaFile().isEmpty()) {
-            String oldImagePath = post.getMediaUrl();
-            if (oldImagePath != null) {
-            Path path = Paths.get(oldImagePath);
-                try {
-                    Files.deleteIfExists(path);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
+
+            if (!java.util.Objects.equals(oldMediaUrl, post.getMediaUrl())) {
+                fileStorageService.deleteFile(oldMediaUrl);
             }
-            System.out.println("999999999999999999999999");
-            post.setMediaUrl(null);
-            post.setMediaType(null);
         }
 
         return postRepository.save(post);

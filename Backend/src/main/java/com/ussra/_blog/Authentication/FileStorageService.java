@@ -52,4 +52,18 @@ public class FileStorageService {
 
         return filePath.toString();
     }
+
+    public void deleteFile(String storedPath) throws IOException {
+        if (storedPath == null || storedPath.isBlank()) {
+            return;
+        }
+
+        Path uploadPath = Paths.get(uploadDir).toAbsolutePath().normalize();
+        Path filePath = Paths.get(storedPath).toAbsolutePath().normalize();
+        if (!filePath.startsWith(uploadPath)) {
+            throw new IOException("Refusing to delete a file outside the upload directory");
+        }
+
+        Files.deleteIfExists(filePath);
+    }
 }

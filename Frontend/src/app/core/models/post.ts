@@ -17,6 +17,17 @@ export interface PostLikeResponse {
   likedByCurrentUser: boolean;
 }
 
+export interface PostDetails {
+  id: number;
+  userId: number;
+  title: string;
+  description: string | null;
+  mediaUrl: string | null;
+  mediaType: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface Author {
   id: number;
   username: string;

@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
-import { Comment, CreateCommentRequest, Post, PostLikeResponse } from '../models/post';
+import { Comment, CreateCommentRequest, Post, PostDetails, PostLikeResponse } from '../models/post';
 import { PaginatedResponse } from '../models/paginated-response';
 
 @Injectable({
@@ -30,6 +30,13 @@ export class PostService {
     console.log("Delete clicked:");
     return this.http.delete<void>(
       `${this.deletePostLink}/${id}`,
+      { withCredentials: true }
+    );
+  }
+
+  getPostById(id: number): Observable<PostDetails> {
+    return this.http.get<PostDetails>(
+      `${this.createPostRoute}/${id}`,
       { withCredentials: true }
     );
   }
@@ -63,10 +70,10 @@ export class PostService {
     });
   }
 
-  updatePost(id: number, content: string): Observable<Post> {
-    return this.http.put<Post>(
-      `${this.apiUrl}/${id}`,
-      { content },
+  updatePost(id: number, data: FormData): Observable<PostDetails> {
+    return this.http.put<PostDetails>(
+      `${this.createPostRoute}/${id}`,
+      data,
       { withCredentials: true }
     );
   }

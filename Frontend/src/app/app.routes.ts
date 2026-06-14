@@ -5,6 +5,7 @@ import { RegisterComponent } from './features/auth/register/register.component';
 import { authGuard } from './core/guards/auth-guard';
 import { guestGuard } from './core/guards/guest-guard';
 import {CreatePostComponent} from './features/posts/create-post/create-post';
+import { EditPost } from './features/posts/edit-post/edit-post';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent, canActivate: [guestGuard] },
@@ -18,6 +19,12 @@ export const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
   {
     path: 'create-post',
-    component: CreatePostComponent
+    component: CreatePostComponent,
+    canActivate: [authGuard]
+  },
+  {
+    path: 'edit-post/:id',
+    component: EditPost,
+    canActivate: [authGuard]
   }
 ];
