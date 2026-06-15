@@ -1,6 +1,6 @@
 .create-post-page {
   min-height: 100vh;
-  background: #f5f7fb;
+  background: var(--page-gradient);
   display: flex;
   justify-content: center;
   padding: 40px 20px;
@@ -9,10 +9,11 @@
 .create-post-card {
   width: 100%;
   max-width: 800px;
-  background: white;
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
   border-radius: 20px;
   padding: 32px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+  box-shadow: 0 16px 38px var(--shadow);
 }
 
 h1 {
@@ -33,7 +34,9 @@ label {
 
 input,
 textarea {
-  border: 1px solid #dcdfe4;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-primary);
   border-radius: 12px;
   padding: 14px;
   font-size: 16px;
@@ -45,7 +48,7 @@ textarea {
 
 button {
   border: none;
-  background: black;
+  background: var(--accent);
   color: white;
   padding: 14px 20px;
   border-radius: 12px;
@@ -56,4 +59,8 @@ button {
 button:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+}
+
+button:hover:not(:disabled) {
+  background: var(--accent-hover);
 }

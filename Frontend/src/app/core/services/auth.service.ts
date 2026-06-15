@@ -2,7 +2,7 @@ import { Injectable, PLATFORM_ID, inject, signal } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { AuthResponse } from '../models/auth-response';
-import { tap, catchError, throwError } from 'rxjs';
+import { Observable, tap, catchError, finalize, throwError } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -58,12 +58,18 @@ export class AuthService {
     );
   }
 
-  logout() {
-    if (isPlatformBrowser(this.platformId)) {
-      localStorage.removeItem('auth_token');
-      localStorage.removeItem('user_data');
-    }
-    this.currentUser.set(null);
+  logout(): Observable<void> {
+    return this.http.post<void>(`${this.API_URL}/logout`, {}, {
+      withCredentials: true
+    }).pipe(
+      finalize(() => {
+        if (isPlatformBrowser(this.platformId)) {
+          localStorage.removeItem('auth_token');
+          localStorage.removeItem('user_data');
+        }
+        this.currentUser.set(null);
+      })
+    );
   }
 
   register(userData: any) {

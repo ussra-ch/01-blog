@@ -3,7 +3,7 @@
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background-color: #f9fafb; /* matches Tailwind's bg-gray-50 */
+  background-color: var(--page-bg);
 }
 
 /* This targets the area where your routed components (Login/Feed) appear */

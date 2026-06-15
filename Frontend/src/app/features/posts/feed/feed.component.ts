@@ -8,11 +8,14 @@ import { CommonModule } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { PaginatedResponse } from '../../../core/models/paginated-response';
 import { Router } from '@angular/router';
+import { RouterLink } from '@angular/router';
+import { SuggestedUser } from '../../../core/models/user';
+import { UserProfileService } from '../../../core/services/user-profile';
 
 @Component({
   selector: 'app-feed',
   standalone: true,
-  imports: [CommonModule, NavBar, PostCardComponent, SinglePost],
+  imports: [CommonModule, RouterLink, NavBar, PostCardComponent, SinglePost],
   templateUrl: './feed.component.html',
   styleUrls: ['./feed.component.scss'],
 })
@@ -20,26 +23,69 @@ export class FeedComponent implements OnInit {
   @ViewChild('scrollTrigger') scrollTrigger!: ElementRef;
 
   private postService = inject(PostService);
+  private profileService = inject(UserProfileService);
   private router = inject(Router);
 
   posts = signal<Post[]>([]);
+  suggestions = signal<SuggestedUser[]>([]);
   loading = signal(false);
+  suggestionsLoading = signal(false);
+  followingUserIds = signal<number[]>([]);
   selectedPost: Post | null = null;
   private page = 0;
   private pageSize = 10;
+  private reachedEnd = false;
 
   ngOnInit() {
     this.loadPosts();
+    this.loadSuggestions();
     this.setupInfiniteScroll();
   }
 
+  loadSuggestions(): void {
+    this.suggestionsLoading.set(true);
+    this.profileService.getSuggestions().subscribe({
+      next: suggestions => {
+        this.suggestions.set(suggestions);
+        this.suggestionsLoading.set(false);
+      },
+      error: () => {
+        this.suggestionsLoading.set(false);
+      }
+    });
+  }
+
+  followSuggestedUser(userId: number): void {
+    if (this.followingUserIds().includes(userId)) return;
+
+    this.followingUserIds.update(ids => [...ids, userId]);
+    this.profileService.follow(userId).subscribe({
+      next: () => {
+        this.suggestions.update(users => users.filter(user => user.id !== userId));
+        this.followingUserIds.update(ids => ids.filter(id => id !== userId));
+      },
+      error: () => {
+        this.followingUserIds.update(ids => ids.filter(id => id !== userId));
+      }
+    });
+  }
+
+  isFollowingSuggestion(userId: number): boolean {
+    return this.followingUserIds().includes(userId);
+  }
+
+  suggestionAvatar(avatarUrl: string | null): string | null {
+    return this.profileService.getAvatarUrl(avatarUrl);
+  }
+
   loadPosts() {
+    if (this.loading() || this.reachedEnd) return;
+
     this.loading.set(true);
     this.postService.getPosts(this.page, this.pageSize).subscribe({
       next: (response: Post[]) => {
-        // console.log("response is :::::");
-        // console.log(response);
         this.posts.update(prev => [...prev, ...response]);
+        this.reachedEnd = response.length < this.pageSize;
         this.page++;
         this.loading.set(false);
       },
@@ -57,7 +103,7 @@ export class FeedComponent implements OnInit {
     setTimeout(() => {
       if (this.scrollTrigger?.nativeElement) {
         const observer = new IntersectionObserver(([entry]) => {
-          if (entry.isIntersecting && !this.loading()) {
+          if (entry.isIntersecting && !this.loading() && !this.reachedEnd) {
             this.loadPosts();
           }
         }, { threshold: 0.1 });

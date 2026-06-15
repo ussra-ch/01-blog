@@ -72,7 +72,7 @@
           data-bs-toggle="dropdown"
         >
           <img
-            src="profile.png"
+            [src]="avatarUrl || 'profile.png'"
             alt="Profile"
             class="profile-avatar"
           />
@@ -96,8 +96,12 @@
           </li>
 
           <li>
-            <button class="dropdown-item">
-              Logout
+            <button
+              type="button"
+              class="dropdown-item"
+              [disabled]="loggingOut"
+              (click)="logout()">
+              {{ loggingOut ? 'Logging out...' : 'Logout' }}
             </button>
           </li>
 

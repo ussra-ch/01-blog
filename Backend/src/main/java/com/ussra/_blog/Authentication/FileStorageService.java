@@ -44,8 +44,11 @@ public class FileStorageService {
             Files.createDirectories(uploadPath);
         }
 
-        // Generate a unique filename to avoid conflicts
-        String filename = UUID.randomUUID() + "_" + file.getOriginalFilename();
+        String originalFilename = file.getOriginalFilename() == null
+                ? "upload"
+                : file.getOriginalFilename().replace('\\', '/');
+        String safeFilename = Paths.get(originalFilename).getFileName().toString();
+        String filename = UUID.randomUUID() + "_" + safeFilename;
         Path filePath = uploadPath.resolve(filename);
         Files.copy(file.getInputStream(), filePath);
         resizeAndSave(filePath, 1200);

@@ -6,6 +6,7 @@ import { AuthService } from '../../../core/services/auth.service';
 import { inject } from '@angular/core';
 import { Post } from '../../../core/models/post';
 import { PostService } from '../../../core/services/post';
+import { RouterLink } from '@angular/router';
 
 
 export interface UserSummary {
@@ -18,7 +19,7 @@ export interface UserSummary {
 @Component({
   selector: 'app-post-card',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterLink],
   templateUrl: './post-card.html',
   styleUrls: ['./post-card.scss']
 })
@@ -32,6 +33,7 @@ export class PostCardComponent {
   private authService = inject(AuthService);
   private postService = inject(PostService);
   voting = false;
+  ownerMenuOpen = false;
 
   get formattedDate(): string {
     return new Date(this.post.createdAt).toLocaleString('en-US', {
@@ -83,6 +85,30 @@ export class PostCardComponent {
         this.voting = false;
       }
     });
+  }
+
+  toggleOwnerMenu(event: MouseEvent): void {
+    event.stopPropagation();
+    this.ownerMenuOpen = !this.ownerMenuOpen;
+  }
+
+  editOwnerPost(event: MouseEvent): void {
+    event.stopPropagation();
+    this.ownerMenuOpen = false;
+    this.editPost.emit(this.post);
+  }
+
+  deleteOwnerPost(event: MouseEvent): void {
+    event.stopPropagation();
+
+    const confirmed = window.confirm(
+      `Delete "${this.post.title}"? This action cannot be undone.`
+    );
+
+    if (confirmed) {
+      this.ownerMenuOpen = false;
+      this.deletePost.emit(this.post);
+    }
   }
 
   get comments(): number {

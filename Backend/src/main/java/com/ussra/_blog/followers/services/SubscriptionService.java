@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 import jakarta.transaction.Transactional;
 
 import com.ussra._blog.followers.repository.SubscriptionRepository;
+import com.ussra._blog.User.UserRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -19,11 +20,23 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class SubscriptionService {
     private final SubscriptionRepository subscriptionRepository;
+    private final UserRepository userRepository;
 
     public void follow(Long followerId, Long followingId) {
+        if (followerId.equals(followingId)) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "You cannot follow yourself.");
+        }
+
+        if (!userRepository.existsById(followingId)) {
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND,
+                    "User does not exist: " + followingId);
+        }
+
         boolean alreadyFollowing = subscriptionRepository
-                .findByFollowerIdAndFollowingId(followerId, followingId)
-                .isPresent();
+                .existsByFollowerIdAndFollowingId(followerId, followingId);
 
         if (alreadyFollowing) {
             throw new ResponseStatusException(
@@ -52,5 +65,17 @@ public class SubscriptionService {
         return list.stream()
                 .map(Subscription::getFollowingId)
                 .collect(Collectors.toList());
+    }
+
+    public boolean isFollowing(Long followerId, Long followingId) {
+        return subscriptionRepository.existsByFollowerIdAndFollowingId(followerId, followingId);
+    }
+
+    public long countFollowers(Long userId) {
+        return subscriptionRepository.countByFollowingId(userId);
+    }
+
+    public long countFollowing(Long userId) {
+        return subscriptionRepository.countByFollowerId(userId);
     }
 }

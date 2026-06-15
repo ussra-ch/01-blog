@@ -1,0 +1,98 @@
+<app-nav-bar></app-nav-bar>
+
+<main class="profile-page">
+  <div class="profile-shell">
+    <div *ngIf="loading()" class="state-card">
+      <div class="spinner-border" role="status"></div>
+      <p>Loading profile...</p>
+    </div>
+
+    <div *ngIf="error() && !loading()" class="state-card error-state">
+      <h2>Profile unavailable</h2>
+      <p>{{ error() }}</p>
+    </div>
+
+    <ng-container *ngIf="profile() as user">
+      <section class="profile-card">
+        <div class="avatar-editor">
+          <div class="profile-avatar" [class.uploading]="avatarUploading()">
+          <img *ngIf="avatarUrl" [src]="avatarUrl" [alt]="user.username" />
+          <span *ngIf="!avatarUrl">{{ initial }}</span>
+            <span *ngIf="avatarUploading()" class="avatar-loading">Saving...</span>
+          </div>
+
+          <label *ngIf="user.currentUser" class="avatar-button" [class.disabled]="avatarUploading()">
+            {{ user.avatarUrl ? 'Change photo' : 'Add photo' }}
+            <input
+              type="file"
+              accept="image/jpeg,image/png"
+              [disabled]="avatarUploading()"
+              (change)="onAvatarSelected($event)" />
+          </label>
+          <p *ngIf="user.currentUser" class="avatar-hint">JPEG or PNG, up to 5 MB</p>
+          <p *ngIf="avatarError()" class="avatar-error">{{ avatarError() }}</p>
+        </div>
+
+        <div class="profile-info">
+          <div class="profile-heading">
+            <div>
+              <p class="eyebrow">{{ user.currentUser ? 'Your profile' : 'Writer profile' }}</p>
+              <h1>{{ user.username }}</h1>
+            </div>
+
+            <button
+              *ngIf="!user.currentUser"
+              class="follow-button"
+              [class.following]="user.followedByCurrentUser"
+              [disabled]="followLoading()"
+              (click)="toggleFollow()">
+              {{ followLoading() ? 'Saving...' : (user.followedByCurrentUser ? 'Unfollow' : 'Follow') }}
+            </button>
+          </div>
+
+          <p class="bio">{{ user.bio || 'This writer has not added a bio yet.' }}</p>
+          <p class="member-since">Member since {{ memberSince }}</p>
+
+          <div class="profile-stats">
+            <div><strong>{{ user.postCount }}</strong><span>Posts</span></div>
+            <div><strong>{{ user.followerCount }}</strong><span>Followers</span></div>
+            <div><strong>{{ user.followingCount }}</strong><span>Following</span></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="posts-section">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Published work</p>
+            <h2>{{ user.currentUser ? 'Your posts' : user.username + "'s posts" }}</h2>
+          </div>
+          <span>{{ posts().length }} {{ posts().length === 1 ? 'story' : 'stories' }}</span>
+        </div>
+
+        <div class="posts-list" *ngIf="posts().length; else emptyPosts">
+          <app-post-card
+            *ngFor="let post of posts()"
+            [post]="post"
+            (openPost)="selectedPost = $any($event)"
+            (editPost)="onEditPost($event)"
+            (deletePost)="onDeletePost($event)">
+          </app-post-card>
+        </div>
+
+        <ng-template #emptyPosts>
+          <div class="empty-posts">
+            <h3>No posts yet</h3>
+            <p>{{ user.currentUser ? 'Your published stories will appear here.' : 'This writer has not published a story yet.' }}</p>
+          </div>
+        </ng-template>
+      </section>
+    </ng-container>
+  </div>
+</main>
+
+<app-single-post
+  *ngIf="selectedPost"
+  [post]="selectedPost"
+  (closed)="selectedPost = null">
+</app-single-post>

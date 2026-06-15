@@ -26,5 +26,15 @@ export const routes: Routes = [
     path: 'edit-post/:id',
     component: EditPost,
     canActivate: [authGuard]
+  },
+  {
+    path: 'profile',
+    canActivate: [authGuard],
+    loadComponent: () => import('./features/profile/profile').then(m => m.ProfileComponent)
+  },
+  {
+    path: 'profile/:id',
+    canActivate: [authGuard],
+    loadComponent: () => import('./features/profile/profile').then(m => m.ProfileComponent)
   }
 ];

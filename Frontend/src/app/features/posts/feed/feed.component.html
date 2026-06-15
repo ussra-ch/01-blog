@@ -1,42 +1,78 @@
 <app-nav-bar></app-nav-bar>
-<div *ngFor="let post of posts()">
-  <div class="feed-wrapper">
-  <div class="container-md">
-
-    <!-- Posts Feed -->
-    <!-- feed.component.html -->
-    <app-post-card
-      *ngFor="let post of posts()"
-      [post]="post"
-      (openPost)="selectedPost = $any($event)"
-      (editPost)="onEditPost($event)"
-      (deletePost)="onDeletePost($event)">
-    </app-post-card>
-
-    <app-single-post
-      *ngIf="selectedPost"
-      [post]="selectedPost"
-      (closed)="selectedPost = null"
-      (commentAdded)="onCommentAdded($event)">
-    </app-single-post>
-
-    <!-- Loading State -->
-    <div *ngIf="loading" class="text-center py-5">
-      <div class="spinner-border spinner-sm mb-3" role="status">
-        <span class="visually-hidden">Loading...</span>
+<main class="feed-wrapper">
+  <div class="feed-layout">
+    <section class="posts-column">
+      <div class="posts-list">
+        <app-post-card
+          *ngFor="let post of posts()"
+          [post]="post"
+          (openPost)="selectedPost = $any($event)"
+          (editPost)="onEditPost($event)"
+          (deletePost)="onDeletePost($event)">
+        </app-post-card>
       </div>
-      <p class="text-muted">Loading more stories...</p>
-    </div>
 
-    <!-- Empty State -->
-    <div *ngIf="posts.length === 0 && !loading" class="empty-state text-center py-5">
-      <i class="bi bi-inbox" style="font-size: 3rem; color: var(--border);"></i>
-      <h5 class="text-muted mt-3">No posts yet</h5>
-      <p class="text-muted">Start following users to see their stories here</p>
-    </div>
+      <div *ngIf="loading()" class="loading-state">
+        <div class="spinner-border spinner-border-sm" role="status"></div>
+        <p>Loading more stories...</p>
+      </div>
 
-    <!-- Infinite Scroll Trigger -->
-    <div #scrollTrigger class="scroll-trigger"></div>
+      <div *ngIf="posts().length === 0 && !loading()" class="empty-state">
+        <h5>No posts yet</h5>
+        <p>Follow some writers to see their stories here.</p>
+      </div>
+
+      <div #scrollTrigger class="scroll-trigger"></div>
+    </section>
+
+    <aside class="suggestions-card">
+      <div class="suggestions-heading">
+        <div>
+          <p>Discover</p>
+          <h2>Suggested writers</h2>
+        </div>
+        <button type="button" title="Refresh suggestions" (click)="loadSuggestions()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M20 11a8.1 8.1 0 0 0-15.5-2M4 4v5h5M4 13a8.1 8.1 0 0 0 15.5 2M20 20v-5h-5"/>
+          </svg>
+        </button>
+      </div>
+
+      <div *ngIf="suggestionsLoading()" class="suggestions-message">Finding writers...</div>
+
+      <div class="suggestions-list" *ngIf="!suggestionsLoading()">
+        <article class="suggested-user" *ngFor="let user of suggestions()">
+          <a [routerLink]="['/profile', user.id]" class="suggested-avatar">
+            <img *ngIf="suggestionAvatar(user.avatarUrl) as avatar" [src]="avatar" [alt]="user.username" />
+            <span *ngIf="!suggestionAvatar(user.avatarUrl)">{{ user.username.charAt(0).toUpperCase() }}</span>
+          </a>
+
+          <div class="suggested-info">
+            <a [routerLink]="['/profile', user.id]">{{ user.username }}</a>
+            <p>{{ user.bio || 'Sharing stories on 01Blog.' }}</p>
+            <span>{{ user.followerCount }} {{ user.followerCount === 1 ? 'follower' : 'followers' }}</span>
+          </div>
+
+          <button
+            type="button"
+            class="suggested-follow"
+            [disabled]="isFollowingSuggestion(user.id)"
+            (click)="followSuggestedUser(user.id)">
+            {{ isFollowingSuggestion(user.id) ? '...' : 'Follow' }}
+          </button>
+        </article>
+
+        <div *ngIf="suggestions().length === 0" class="suggestions-message">
+          You are all caught up.
+        </div>
+      </div>
+    </aside>
   </div>
-</div>
-</div>
+</main>
+
+<app-single-post
+  *ngIf="selectedPost"
+  [post]="selectedPost"
+  (closed)="selectedPost = null"
+  (commentAdded)="onCommentAdded($event)">
+</app-single-post>

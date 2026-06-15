@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import java.util.List;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import jakarta.validation.Valid;
 
 
@@ -34,12 +35,15 @@ public class PostController {
     private final PostService postService;
 
     @GetMapping("/feed")
-    public ResponseEntity<List<FeedPostResponse>> getFeed(@AuthenticationPrincipal UserPrincipal currentUser) {
+    public ResponseEntity<List<FeedPostResponse>> getFeed(
+            @AuthenticationPrincipal UserPrincipal currentUser,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
         // User user = (User) authentication.getPrincipal();
         // System.out.println("-----------------------------------------------------");
         // System.out.println(currentUser.getUser());
         return ResponseEntity.ok(
-                postService.getFeedPosts(currentUser.getUser().getId())
+                postService.getFeedPosts(currentUser.getUser().getId(), page, size)
         );
     }
 

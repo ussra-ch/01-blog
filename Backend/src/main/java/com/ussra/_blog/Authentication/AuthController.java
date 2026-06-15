@@ -48,4 +48,19 @@ public class AuthController {
         }
         return ResponseEntity.ok(authentication.getPrincipal());
     }
+
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout() {
+        ResponseCookie cookie = ResponseCookie.from("auth_token", "")
+                .httpOnly(true)
+                .secure(false)
+                .path("/")
+                .sameSite("Lax")
+                .maxAge(0)
+                .build();
+
+        return ResponseEntity.noContent()
+                .header(HttpHeaders.SET_COOKIE, cookie.toString())
+                .build();
+    }
 }

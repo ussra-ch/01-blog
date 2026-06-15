@@ -22,6 +22,7 @@ import com.ussra._blog.posts.repository.*;
 import lombok.RequiredArgsConstructor;
 import java.util.List;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.data.domain.PageRequest;
 
 
 import com.ussra._blog.User.User;
@@ -117,15 +118,31 @@ public class PostService {
         postRepository.delete(post);
     }
 
-    public List<FeedPostResponse> getFeedPosts(Long currentUserId) {
+    public List<FeedPostResponse> getFeedPosts(Long currentUserId, int page, int size) {
         // System.out.println("befooooooooore");
-        List<Post> posts = postRepository.getFeedPosts(currentUserId);
+        int safePage = Math.max(page, 0);
+        int safeSize = Math.max(1, Math.min(size, 50));
+        List<Post> posts = postRepository.getFeedPosts(currentUserId, PageRequest.of(safePage, safeSize));
         // System.out.println("afteeeeeeeeeer");
         // System.out.println("afteeeeeeeeeer :::");
         // System.out.println(posts);
         return posts.stream()
                 .map(post -> mapToFeedResponse(post, currentUserId))
                 .toList();
+    }
+
+    public List<FeedPostResponse> getPostsByUser(Long userId, Long currentUserId) {
+        if (!userRepository.existsById(userId)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User does not exist: " + userId);
+        }
+
+        return postRepository.findAllByUserIdOrderByCreatedAtDesc(userId).stream()
+                .map(post -> mapToFeedResponse(post, currentUserId))
+                .toList();
+    }
+
+    public long countPostsByUser(Long userId) {
+        return postRepository.countByUserId(userId);
     }
 
     @Transactional
@@ -181,7 +198,7 @@ public class PostService {
             UserSummaryResponse author = new UserSummaryResponse();
             author.setId(user.getId());
             author.setUsername(user.getUsername());
-            // author.setProfilePicture(post.getAuthor(user.getProfilePicture()));
+            author.setProfilePicture(user.getAvatarUrl());
             response.setAuthor(author);
             response.setLikeCount(postLikeRepository.countByPostId(post.getId()));
             response.setLikedByCurrentUser(postLikeRepository.existsByPostIdAndUserId(post.getId(), currentUserId));

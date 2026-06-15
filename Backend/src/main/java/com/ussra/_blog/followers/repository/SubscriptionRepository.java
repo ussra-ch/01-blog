@@ -12,5 +12,8 @@ import org.springframework.stereotype.Repository;
 public interface SubscriptionRepository extends JpaRepository<Subscription, Long> {
     Optional<Subscription> findByFollowerIdAndFollowingId(Long followerId, Long followingId); 
     List<Subscription> findAllByFollowerId(Long followerId);
+    boolean existsByFollowerIdAndFollowingId(Long followerId, Long followingId);
+    long countByFollowerId(Long followerId);
+    long countByFollowingId(Long followingId);
     void deleteByFollowerIdAndFollowingId(Long followerId, Long followingId);
 }
