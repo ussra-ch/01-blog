@@ -32,6 +32,9 @@ public class Post {
     @Column(name = "media_type")
     private String mediaType;
 
+    @Column(name = "is_hidden")
+    private boolean isHidden;
+
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 

@@ -13,19 +13,34 @@ import java.util.List;
 @Repository
 public interface PostRepository extends JpaRepository<Post, Long>{
     Optional<Post> getPostById(Long id);
-    List<Post> findAllByUserIdOrderByCreatedAtDesc(Long userId);
-    long countByUserId(Long userId);
+    List<Post> findAllByUserIdAndIsHiddenFalseOrderByCreatedAtDesc(Long userId);
+    long countByUserIdAndIsHiddenFalse(Long userId);
 
     @Query("""
         SELECT p
         FROM Post p
-        WHERE p.userId IN (
+        WHERE p.isHidden = false
+        AND (p.userId IN (
             SELECT s.followingId
             FROM Subscription s
             WHERE s.followerId = :userId
         )
-        OR p.userId = :userId
+        OR p.userId = :userId)
         ORDER BY p.createdAt DESC
     """)
     List<Post> getFeedPosts(Long userId, Pageable pageable);
+
+    @Query("""
+        SELECT p
+        FROM Post p, User u
+        WHERE p.userId = u.id
+        AND p.isHidden = false
+        AND u.isBanned = false
+        AND (
+            LOWER(p.title) LIKE LOWER(CONCAT('%', :query, '%'))
+            OR LOWER(COALESCE(p.description, '')) LIKE LOWER(CONCAT('%', :query, '%'))
+        )
+        ORDER BY p.createdAt DESC
+    """)
+    List<Post> searchPosts(String query, Pageable pageable);
 }

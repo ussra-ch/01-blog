@@ -1,0 +1,104 @@
+<app-nav-bar></app-nav-bar>
+
+<main class="admin-page">
+  <header class="admin-header">
+    <div>
+      <p class="eyebrow">Moderation center</p>
+      <h1>Admin dashboard</h1>
+      <p>Review reports and keep the community healthy.</p>
+    </div>
+    <button type="button" class="refresh-button" [disabled]="loading()" (click)="refresh()">Refresh data</button>
+  </header>
+
+  <section class="metrics">
+    <button type="button" [class.active]="activeTab() === 'reports'" (click)="setTab('reports')">
+      <span>Profile reports</span><strong>{{ openReportCount() }}</strong>
+    </button>
+    <button type="button" [class.active]="activeTab() === 'users'" (click)="setTab('users')">
+      <span>Users</span><strong>{{ users().length }}</strong>
+    </button>
+    <button type="button" [class.active]="activeTab() === 'posts'" (click)="setTab('posts')">
+      <span>Posts</span><strong>{{ posts().length }}</strong>
+    </button>
+  </section>
+
+  <p class="error-banner" *ngIf="error()">{{ error() }}</p>
+  <div class="loading-card" *ngIf="loading()">Loading moderation queue...</div>
+
+  <section class="panel" *ngIf="!loading() && activeTab() === 'reports'">
+    <div class="panel-heading"><div><span>Admin only</span><h2>Submitted profile reports</h2></div></div>
+    <div class="card-list">
+      <article class="moderation-card" *ngFor="let report of reports()">
+        <div class="card-main">
+          <div class="card-title">
+            <strong>@{{ report.reportedUser }}</strong>
+            <span class="badge open">PROFILE REPORT</span>
+          </div>
+          <div class="report-reason">
+            <span>Submitted reason</span>
+            <p>{{ report.reason }}</p>
+          </div>
+          <small>Reported by @{{ report.reporter }} · {{ report.createdAt | date:'medium' }}</small>
+        </div>
+        <div class="actions">
+          <ng-container *ngIf="reportUser(report) as user">
+            <button *ngIf="user.role !== 'ADMIN'" type="button" class="action-button warning" [disabled]="isBusy('user-' + user.id)" (click)="toggleBan(user)">
+              <span aria-hidden="true">{{ user.banned ? '+' : '!' }}</span>
+              {{ user.banned ? 'Unban User' : 'Ban User' }}
+            </button>
+            <button *ngIf="user.role !== 'ADMIN'" type="button" class="action-button danger" [disabled]="isBusy('user-' + user.id)" (click)="deleteUser(user)">
+              <span aria-hidden="true">×</span> Delete User
+            </button>
+          </ng-container>
+          <button type="button" class="action-button neutral" [disabled]="isBusy('report-' + report.id)" (click)="removeReport(report)">
+            <span aria-hidden="true">×</span> Remove Report
+          </button>
+        </div>
+      </article>
+      <p class="empty" *ngIf="reports().length === 0">No reports have been submitted.</p>
+    </div>
+  </section>
+
+  <section class="panel" *ngIf="!loading() && activeTab() === 'users'">
+    <div class="panel-heading"><div><span>Accounts</span><h2>All users</h2></div></div>
+    <div class="card-list">
+      <article class="moderation-card" *ngFor="let user of users()">
+        <div class="avatar">{{ user.username.charAt(0).toUpperCase() }}</div>
+        <div class="card-main">
+          <div class="card-title"><strong>@{{ user.username }}</strong><span class="badge" [class.banned]="user.banned">{{ user.banned ? 'BANNED' : user.role }}</span></div>
+          <p>{{ user.email }}</p><small>Joined {{ user.createdAt | date:'mediumDate' }}</small>
+        </div>
+        <div class="actions" *ngIf="user.role !== 'ADMIN'">
+          <button type="button" class="action-button warning" [disabled]="isBusy('user-' + user.id)" (click)="toggleBan(user)">
+            <span aria-hidden="true">{{ user.banned ? '+' : '!' }}</span>
+            {{ user.banned ? 'Unban User' : 'Ban User' }}
+          </button>
+          <button type="button" class="action-button danger" [disabled]="isBusy('user-' + user.id)" (click)="deleteUser(user)">
+            <span aria-hidden="true">×</span> Delete User
+          </button>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section class="panel" *ngIf="!loading() && activeTab() === 'posts'">
+    <div class="panel-heading"><div><span>Content</span><h2>All posts</h2></div></div>
+    <div class="card-list">
+      <article class="moderation-card" *ngFor="let post of posts()">
+        <div class="card-main">
+          <div class="card-title"><strong>{{ post.title }}</strong><span class="badge" [class.hidden]="post.hidden">{{ post.hidden ? 'HIDDEN' : 'VISIBLE' }}</span></div>
+          <p>{{ post.description || 'No description.' }}</p><small>By @{{ post.author }} · {{ post.createdAt | date:'medium' }}</small>
+        </div>
+        <div class="actions">
+          <button type="button" class="action-button warning" [disabled]="isBusy('post-' + post.id)" (click)="toggleHide(post)">
+            <span aria-hidden="true">{{ post.hidden ? '+' : '-' }}</span>
+            {{ post.hidden ? 'Show Post' : 'Hide Post' }}
+          </button>
+          <button type="button" class="action-button danger" [disabled]="isBusy('post-' + post.id)" (click)="deletePost(post)">
+            <span aria-hidden="true">×</span> Delete Post
+          </button>
+        </div>
+      </article>
+    </div>
+  </section>
+</main>

@@ -28,13 +28,28 @@
         >
           Write
         </a>
+
+        <a
+          *ngIf="isAdmin"
+          routerLink="/admin"
+          routerLinkActive="active"
+          class="nav-link"
+        >
+          Admin
+        </a>
     </div>
 
     <!-- Right actions -->
     <div class="nav-actions">
 
-      <!-- Search -->
-      <button class="btn-icon" title="Search">
+      <form class="search-form" (ngSubmit)="submitSearch()">
+        <input
+          type="search"
+          name="search"
+          [(ngModel)]="searchQuery"
+          placeholder="Search posts or writers"
+          aria-label="Search posts or writers" />
+        <button class="btn-icon" type="submit" title="Search">
         <svg
           width="20"
           height="20"
@@ -46,7 +61,8 @@
           <circle cx="11" cy="11" r="8"></circle>
           <path d="m21 21-4.35-4.35"></path>
         </svg>
-      </button>
+        </button>
+      </form>
 
       <!-- Notifs -->
       <button class="btn-icon" title="Notifications">

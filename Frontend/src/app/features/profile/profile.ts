@@ -1,5 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, OnInit, inject, signal } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { HttpErrorResponse } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription, forkJoin } from 'rxjs';
 import { NavBar } from '../../core/components/nav-bar/nav-bar';
@@ -14,7 +16,7 @@ import { SinglePost } from '../posts/single-post/single-post';
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [CommonModule, NavBar, PostCardComponent, SinglePost],
+  imports: [CommonModule, FormsModule, NavBar, PostCardComponent, SinglePost],
   templateUrl: './profile.html',
   styleUrl: './profile.scss'
 })
@@ -34,6 +36,11 @@ export class ProfileComponent implements OnInit, OnDestroy {
   avatarError = signal('');
   avatarPreviewUrl = signal<string | null>(null);
   error = signal('');
+  reportFormOpen = signal(false);
+  reportReason = '';
+  reportSubmitting = signal(false);
+  reportSubmitted = signal(false);
+  reportError = signal('');
   selectedPost: Post | null = null;
 
   ngOnInit(): void {
@@ -93,6 +100,40 @@ export class ProfileComponent implements OnInit, OnDestroy {
       },
       error: () => {
         this.followLoading.set(false);
+      }
+    });
+  }
+
+  openReportForm(): void {
+    this.reportFormOpen.set(true);
+    this.reportReason = '';
+    this.reportError.set('');
+    this.reportSubmitted.set(false);
+  }
+
+  closeReportForm(): void {
+    if (this.reportSubmitting()) return;
+    this.reportFormOpen.set(false);
+  }
+
+  submitProfileReport(): void {
+    const profile = this.profile();
+    const reason = this.reportReason.trim();
+    if (!profile || profile.currentUser || !reason || this.reportSubmitting()) return;
+
+    this.reportSubmitting.set(true);
+    this.reportError.set('');
+    this.profileService.reportProfile(profile.id, reason).subscribe({
+      next: () => {
+        this.reportSubmitting.set(false);
+        this.reportSubmitted.set(true);
+        this.reportReason = '';
+      },
+      error: (error: HttpErrorResponse) => {
+        this.reportSubmitting.set(false);
+        this.reportError.set(error.status === 409
+          ? 'You already reported this profile.'
+          : 'The report could not be submitted. Please try again.');
       }
     });
   }
@@ -158,6 +199,9 @@ export class ProfileComponent implements OnInit, OnDestroy {
     this.error.set('');
     this.profile.set(null);
     this.posts.set([]);
+    this.reportFormOpen.set(false);
+    this.reportSubmitted.set(false);
+    this.reportError.set('');
 
     forkJoin({
       profile: this.profileService.getProfile(userId),

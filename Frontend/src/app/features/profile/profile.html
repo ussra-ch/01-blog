@@ -40,18 +40,64 @@
               <h1>{{ user.username }}</h1>
             </div>
 
-            <button
-              *ngIf="!user.currentUser"
-              class="follow-button"
-              [class.following]="user.followedByCurrentUser"
-              [disabled]="followLoading()"
-              (click)="toggleFollow()">
-              {{ followLoading() ? 'Saving...' : (user.followedByCurrentUser ? 'Unfollow' : 'Follow') }}
-            </button>
+            <div class="profile-actions" *ngIf="!user.currentUser">
+              <button
+                class="follow-button"
+                [class.following]="user.followedByCurrentUser"
+                [disabled]="followLoading()"
+                (click)="toggleFollow()">
+                {{ followLoading() ? 'Saving...' : (user.followedByCurrentUser ? 'Unfollow' : 'Follow') }}
+              </button>
+              <button type="button" class="report-profile-button" (click)="openReportForm()">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none"
+                  viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M5 5v16M5 5h11l-1 4 1 4H5"/>
+                </svg>
+                Report profile
+              </button>
+            </div>
           </div>
 
           <p class="bio">{{ user.bio || 'This writer has not added a bio yet.' }}</p>
           <p class="member-since">Member since {{ memberSince }}</p>
+
+          <section class="profile-report-form" *ngIf="reportFormOpen() && !user.currentUser">
+            <div class="report-form-heading">
+              <div>
+                <span>Community safety</span>
+                <h3>Report @{{ user.username }}</h3>
+              </div>
+              <button type="button" [disabled]="reportSubmitting()" (click)="closeReportForm()" aria-label="Close report form">×</button>
+            </div>
+
+            <div class="report-success" *ngIf="reportSubmitted()">
+              <strong>Report submitted</strong>
+              <p>Your report is stored for the admin moderation team to review.</p>
+              <button type="button" (click)="closeReportForm()">Done</button>
+            </div>
+
+            <form *ngIf="!reportSubmitted()" (ngSubmit)="submitProfileReport()">
+              <label for="profile-report-reason">Reason</label>
+              <textarea
+                id="profile-report-reason"
+                name="profileReportReason"
+                [(ngModel)]="reportReason"
+                maxlength="1000"
+                rows="4"
+                placeholder="Describe the inappropriate or offensive content..."
+                required></textarea>
+              <div class="report-form-meta">
+                <span>{{ reportReason.length }}/1000</span>
+                <span class="report-error" *ngIf="reportError()">{{ reportError() }}</span>
+              </div>
+              <div class="report-form-actions">
+                <button type="button" class="cancel" [disabled]="reportSubmitting()" (click)="closeReportForm()">Cancel</button>
+                <button type="submit" class="submit" [disabled]="!reportReason.trim() || reportSubmitting()">
+                  {{ reportSubmitting() ? 'Submitting...' : 'Submit report' }}
+                </button>
+              </div>
+            </form>
+          </section>
 
           <div class="profile-stats">
             <div><strong>{{ user.postCount }}</strong><span>Posts</span></div>

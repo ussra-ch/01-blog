@@ -25,6 +25,7 @@ CREATE TABLE IF NOT EXISTS posts (
     description TEXT,
     media_url   VARCHAR(500),
     media_type  VARCHAR(10)     CHECK (media_type IN ('IMAGE', 'VIDEO')),
+    is_hidden   BOOLEAN         NOT NULL DEFAULT FALSE,
     created_at  TIMESTAMP       NOT NULL DEFAULT NOW(),
     updated_at  TIMESTAMP       NOT NULL DEFAULT NOW()
 );
@@ -96,11 +97,16 @@ CREATE TABLE IF NOT EXISTS reports (
     reason              TEXT            NOT NULL,
     created_at          TIMESTAMP       NOT NULL DEFAULT NOW(),
 
-    -- a user can only report another user once
-    CONSTRAINT unique_report UNIQUE (reporter_id, reported_user_id),
-    -- a user cannot report themselves
     CONSTRAINT no_self_report CHECK (reporter_id <> reported_user_id)
 );
+
+ALTER TABLE posts ADD COLUMN IF NOT EXISTS is_hidden BOOLEAN NOT NULL DEFAULT FALSE;
+ALTER TABLE reports DROP CONSTRAINT IF EXISTS unique_report;
+ALTER TABLE reports DROP CONSTRAINT IF EXISTS one_report_target;
+DELETE FROM reports WHERE reported_user_id IS NULL;
+ALTER TABLE reports ALTER COLUMN reported_user_id SET NOT NULL;
+ALTER TABLE reports DROP COLUMN IF EXISTS reported_post_id;
+ALTER TABLE reports DROP COLUMN IF EXISTS status;
 
 
 -- -------------------------------------------------------------

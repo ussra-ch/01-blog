@@ -6,6 +6,7 @@ import { authGuard } from './core/guards/auth-guard';
 import { guestGuard } from './core/guards/guest-guard';
 import {CreatePostComponent} from './features/posts/create-post/create-post';
 import { EditPost } from './features/posts/edit-post/edit-post';
+import { adminGuard } from './core/guards/admin-guard';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent, canActivate: [guestGuard] },
@@ -36,5 +37,15 @@ export const routes: Routes = [
     path: 'profile/:id',
     canActivate: [authGuard],
     loadComponent: () => import('./features/profile/profile').then(m => m.ProfileComponent)
+  },
+  {
+    path: 'admin',
+    canActivate: [adminGuard],
+    loadComponent: () => import('./features/admin/admin-dashboard').then(m => m.AdminDashboard)
+  },
+  {
+    path: 'search',
+    canActivate: [authGuard],
+    loadComponent: () => import('./features/search/search-page').then(m => m.SearchPage)
   }
 ];

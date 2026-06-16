@@ -136,13 +136,13 @@ public class PostService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User does not exist: " + userId);
         }
 
-        return postRepository.findAllByUserIdOrderByCreatedAtDesc(userId).stream()
+        return postRepository.findAllByUserIdAndIsHiddenFalseOrderByCreatedAtDesc(userId).stream()
                 .map(post -> mapToFeedResponse(post, currentUserId))
                 .toList();
     }
 
     public long countPostsByUser(Long userId) {
-        return postRepository.countByUserId(userId);
+        return postRepository.countByUserIdAndIsHiddenFalse(userId);
     }
 
     @Transactional

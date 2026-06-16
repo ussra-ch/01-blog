@@ -69,4 +69,10 @@ export class UserProfileService {
       withCredentials: true
     });
   }
+
+  reportProfile(userId: number, reason: string): Observable<void> {
+    return this.http.post<void>('http://localhost:8080/api/reports', { userId, reason }, {
+      withCredentials: true
+    });
+  }
 }
