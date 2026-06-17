@@ -1,0 +1,116 @@
+<app-nav-bar></app-nav-bar>
+
+<main class="explore-page">
+  <section class="explore-shell">
+    <div class="explore-heading">
+      <div>
+        <p>Explore</p>
+      </div>
+    </div>
+
+    <div class="collection-layout" *ngIf="posts().length">
+      <ng-container *ngFor="let section of exploreSections(); let sectionIndex = index">
+        <div class="post-card-row">
+          <article
+            *ngFor="let post of section.cards"
+            class="compact-post-card"
+            (click)="openPost(post)">
+            <div class="compact-media">
+              <img [src]="coverUrl(post)" [alt]="post.title" loading="lazy" />
+            </div>
+
+            <h2>{{ post.title }}</h2>
+            <a [routerLink]="['/profile', post.author.id]" (click)="$event.stopPropagation()">
+              {{ post.author.username }}
+            </a>
+            <button
+              type="button"
+              class="post-like"
+              [class.liked]="post.likedByCurrentUser"
+              [disabled]="isLiking(post.postId)"
+              (click)="toggleLike($event, post)"
+              title="Upvote">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7"/>
+              </svg>
+              <span>{{ post.likeCount }}</span>
+            </button>
+          </article>
+        </div>
+
+        <article
+          *ngIf="section.featured as featured"
+          class="featured-post"
+          (click)="openPost(featured)">
+          <div class="featured-stats">
+            <button
+              type="button"
+              class="post-like"
+              [class.liked]="featured.likedByCurrentUser"
+              [disabled]="isLiking(featured.postId)"
+              (click)="toggleLike($event, featured)"
+              title="Upvote">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7"/>
+              </svg>
+              <span>{{ featured.likeCount }}</span>
+            </button>
+
+            <button
+              type="button"
+              class="post-like"
+              (click)="openPost(featured); $event.stopPropagation()"
+              title="Comments">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+              </svg>
+              <span>{{ featured.commentCount }}</span>
+            </button>
+          </div>
+
+          <div class="featured-media">
+            <img [src]="coverUrl(featured)" [alt]="featured.title" loading="lazy" />
+          </div>
+
+          <div class="featured-content">
+            <a
+              class="featured-author"
+              [routerLink]="['/profile', featured.author.id]"
+              (click)="$event.stopPropagation()">
+              {{ featured.author.username }}
+            </a>
+
+            <h2>{{ featured.title }}</h2>
+            <p>{{ featured.description || 'Open the post to discover what this writer shared.' }}</p>
+
+            <div class="featured-actions">
+              <button type="button" class="read-btn" (click)="openPost(featured); $event.stopPropagation()">
+                Read post
+              </button>
+            </div>
+          </div>
+        </article>
+      </ng-container>
+    </div>
+
+    <div *ngIf="loading()" class="loading-state">
+      <div class="spinner-border spinner-border-sm" role="status"></div>
+      <span>Loading more discoveries...</span>
+    </div>
+
+    <div *ngIf="posts().length === 0 && !loading()" class="empty-state">
+      <h2>Nothing new to explore</h2>
+      <p>Posts from writers outside your following list will appear here.</p>
+    </div>
+
+    <div #scrollTrigger class="scroll-trigger"></div>
+  </section>
+</main>
+
+<app-single-post
+  *ngIf="selectedPost"
+  [post]="selectedPost"
+  (closed)="selectedPost = null"
+  (commentAdded)="onCommentAdded()">
+</app-single-post>

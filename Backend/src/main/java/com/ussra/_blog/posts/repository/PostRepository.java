@@ -36,6 +36,22 @@ public interface PostRepository extends JpaRepository<Post, Long>{
         WHERE p.userId = u.id
         AND p.isHidden = false
         AND u.isBanned = false
+        AND p.userId <> :userId
+        AND p.userId NOT IN (
+            SELECT s.followingId
+            FROM Subscription s
+            WHERE s.followerId = :userId
+        )
+        ORDER BY p.createdAt DESC
+    """)
+    List<Post> getExplorePosts(Long userId, Pageable pageable);
+
+    @Query("""
+        SELECT p
+        FROM Post p, User u
+        WHERE p.userId = u.id
+        AND p.isHidden = false
+        AND u.isBanned = false
         AND (
             LOWER(p.title) LIKE LOWER(CONCAT('%', :query, '%'))
             OR LOWER(COALESCE(p.description, '')) LIKE LOWER(CONCAT('%', :query, '%'))

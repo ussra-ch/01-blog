@@ -47,6 +47,16 @@ public class PostController {
         );
     }
 
+    @GetMapping("/explore")
+    public ResponseEntity<List<FeedPostResponse>> getExplore(
+            @AuthenticationPrincipal UserPrincipal currentUser,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size) {
+        return ResponseEntity.ok(
+                postService.getExplorePosts(currentUser.getUser().getId(), page, size)
+        );
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<Post> getPostById(@PathVariable Long id) {
         Post post = postService.getPostById(id);

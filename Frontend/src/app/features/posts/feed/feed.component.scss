@@ -32,7 +32,7 @@
   background: var(--surface-raised);
   border: 1px solid var(--border);
   border-radius: 22px;
-  box-shadow: 0 14px 34px var(--shadow);
+  box-shadow: var(--shadow-md);
 }
 
 .suggestions-heading {
@@ -94,7 +94,7 @@
   width: 38px;
   height: 38px;
   overflow: hidden;
-  color: #fff;
+  color: var(--page-bg);
   background: var(--avatar-gradient);
   border-radius: 50%;
   font-size: 0.78rem;
@@ -146,7 +146,7 @@
 
 .suggested-follow {
   padding: 0.35rem 0.55rem;
-  color: #fff;
+  color: var(--page-bg);
   background: var(--accent);
   border: 1px solid var(--accent);
   border-radius: 7px;
@@ -156,7 +156,7 @@
 }
 
 .suggested-follow:hover:not(:disabled) {
-  color: #fff;
+  color: var(--page-bg);
   background: var(--accent-hover);
 }
 

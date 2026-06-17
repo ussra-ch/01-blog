@@ -13,7 +13,7 @@
   border: 1px solid var(--border);
   border-radius: 20px;
   padding: 32px;
-  box-shadow: 0 16px 38px var(--shadow);
+  box-shadow: var(--shadow-md);
 }
 
 h1 {
@@ -49,7 +49,7 @@ textarea {
 button {
   border: none;
   background: var(--accent);
-  color: white;
+  color: var(--page-bg);
   padding: 14px 20px;
   border-radius: 12px;
   cursor: pointer;

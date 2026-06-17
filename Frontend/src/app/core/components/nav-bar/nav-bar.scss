@@ -4,10 +4,10 @@
 
 .navbar-moroccan {
   width: 100%;
-  background-color: rgba(248, 250, 252, 0.95);
+  background-color: var(--page-bg);
   border-bottom: 1px solid var(--border);
   padding: 1px 24px;
-  box-shadow: 0 8px 24px var(--shadow);
+  box-shadow: 0 8px 28px rgba(51, 102, 131, 0.2);
 }
 
 .navbar-content {
@@ -52,7 +52,7 @@
 
 .nav-link.active {
   background-color: var(--accent);
-  color: white;
+  color: var(--page-bg);
   font-weight: bold;
 }
 
@@ -77,7 +77,7 @@
   height: 16px;
   border-radius: 50%;
   background: var(--danger);
-  color: white;
+  color: var(--page-bg);
   font-size: 10px;
   font-weight: 600;
   display: flex;
@@ -99,7 +99,7 @@
 
 .search-form:focus-within {
   border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(82, 125, 165, 0.13);
+  box-shadow: 0 0 0 3px rgba(102, 155, 188, 0.24);
 }
 
 .search-form input {
@@ -167,7 +167,7 @@
 .moroccan-dropdown {
   border: 1px solid var(--border);
   background-color: var(--surface-raised);
-  box-shadow: 0 12px 30px var(--shadow);
+  box-shadow: var(--shadow-md);
 }
 
 .dropdown-item {

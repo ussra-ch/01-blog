@@ -24,7 +24,7 @@
   background: var(--surface-raised);
   border: 1px solid var(--border);
   border-radius: 20px;
-  box-shadow: 0 24px 70px var(--shadow);
+  box-shadow: var(--shadow-lg);
 }
 
 .profile-avatar {
@@ -36,7 +36,7 @@
   overflow: hidden;
   border: 3px solid var(--border-strong);
   border-radius: 50%;
-  color: #fff;
+  color: var(--page-bg);
   background: var(--avatar-gradient);
   font-size: 3rem;
   font-weight: 800;
@@ -65,8 +65,8 @@
   inset: 0;
   display: grid;
   place-items: center;
-  color: #fff;
-  background: rgba(8, 10, 16, 0.5);
+  color: var(--page-bg);
+  background: rgba(51, 102, 131, 0.52);
   font-size: 0.78rem;
   font-weight: 700;
 }
@@ -84,7 +84,7 @@
 }
 
 .avatar-button:hover {
-  color: #fff;
+  color: var(--page-bg);
   border-color: var(--accent);
   background: var(--accent);
 }
@@ -158,7 +158,7 @@ h1 {
   padding: 0.7rem 1.15rem;
   border: 1px solid var(--accent);
   border-radius: 999px;
-  color: #fff;
+  color: var(--page-bg);
   background: var(--accent);
   font-weight: 700;
   transition: 0.2s ease;
@@ -166,6 +166,7 @@ h1 {
 
 .follow-button:hover:not(:disabled) {
   transform: translateY(-1px);
+  color: var(--page-bg);
   background: var(--accent-hover);
 }
 
@@ -173,6 +174,11 @@ h1 {
   color: var(--accent-hover);
   background: transparent;
   border-color: var(--border-strong);
+}
+
+.follow-button.following:hover:not(:disabled) {
+  color: var(--page-bg);
+  background: var(--accent-hover);
 }
 
 .follow-button:disabled {
@@ -195,14 +201,14 @@ h1 {
   padding: 0.7rem 1rem;
   color: var(--danger);
   background: var(--danger-soft);
-  border: 1px solid #e5abb3;
+  border: 1px solid var(--border);
   border-radius: 999px;
   font-weight: 700;
   cursor: pointer;
 }
 
 .report-profile-button:hover {
-  color: #fff;
+  color: var(--page-bg);
   background: var(--danger);
 }
 
@@ -211,7 +217,7 @@ h1 {
   margin: 1.25rem 0;
   overflow: hidden;
   background: var(--surface);
-  border: 1px solid #e5abb3;
+  border: 1px solid var(--border);
   border-radius: 14px;
 }
 
@@ -221,7 +227,7 @@ h1 {
   justify-content: space-between;
   padding: 0.9rem 1rem;
   background: var(--danger-soft);
-  border-bottom: 1px solid #e5abb3;
+  border-bottom: 1px solid var(--border);
 }
 
 .report-form-heading span {
@@ -272,7 +278,7 @@ h1 {
 
 .profile-report-form textarea:focus {
   border-color: var(--danger);
-  box-shadow: 0 0 0 3px rgba(182, 92, 102, 0.13);
+  box-shadow: 0 0 0 3px rgba(193, 18, 31, 0.18);
 }
 
 .report-form-meta {
@@ -312,7 +318,7 @@ h1 {
 
 .report-form-actions .submit,
 .report-success button {
-  color: #fff;
+  color: var(--page-bg);
   background: var(--danger);
   border-color: var(--danger);
 }

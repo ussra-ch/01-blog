@@ -3,7 +3,7 @@
   position: fixed;
   inset: 0;
   z-index: 1050;
-  background: rgba(72, 91, 112, 0.42);
+  background: rgba(51, 102, 131, 0.42);
   backdrop-filter: blur(4px);
   display: flex;
   align-items: flex-start;
@@ -30,7 +30,7 @@
   flex-direction: column;
   overflow: hidden;
   animation: slide-up 0.22s cubic-bezier(0.16, 1, 0.3, 1);
-  box-shadow: 0 32px 80px rgba(67, 91, 116, 0.28);
+  box-shadow: var(--shadow-lg);
 }
 
 @keyframes slide-up {
@@ -44,7 +44,7 @@
   top: 14px;
   right: 14px;
   z-index: 10;
-  background: rgba(248, 250, 252, 0.9);
+  background: var(--page-bg);
   border: 1px solid var(--border);
   border-radius: 50%;
   width: 36px;
@@ -111,7 +111,7 @@
   height: 36px;
   border-radius: 50%;
   background: var(--avatar-gradient);
-  color: #fff;
+  color: var(--page-bg);
   font-size: 0.8rem;
   font-weight: 700;
   display: flex;
@@ -196,11 +196,11 @@
   }
 
   &.liked {
-    color: var(--accent);
-    border-color: var(--accent);
-    background: var(--accent-soft);
+    color: var(--page-bg);
+    border-color: var(--danger);
+    background: var(--danger);
 
-    svg { stroke: var(--accent); }
+    svg { stroke: var(--page-bg); }
   }
 }
 
@@ -245,7 +245,7 @@
   background: var(--accent);
   border: none;
   border-radius: 8px;
-  color: #fff;
+  color: var(--page-bg);
   font-size: 0.83rem;
   font-weight: 600;
   padding: 8px 20px;
@@ -284,7 +284,7 @@
   height: 30px;
   border-radius: 50%;
   background: var(--avatar-gradient);
-  color: #fff;
+  color: var(--page-bg);
   font-size: 0.72rem;
   font-weight: 700;
   display: flex;

@@ -74,7 +74,7 @@
   border: 1px solid var(--border);
   border-radius: 16px;
   text-decoration: none;
-  box-shadow: 0 10px 24px rgba(67, 91, 116, 0.09);
+  box-shadow: var(--shadow);
 }
 
 .user-result:hover {
@@ -103,7 +103,7 @@
   width: 44px;
   height: 44px;
   overflow: hidden;
-  color: #fff;
+  color: var(--page-bg);
   background: var(--avatar-gradient);
   border-radius: 50%;
   font-weight: 800;

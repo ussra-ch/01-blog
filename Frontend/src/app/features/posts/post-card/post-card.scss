@@ -3,7 +3,7 @@
   border: 1px solid var(--border);
   border-radius: 20px;
   padding: 1rem 1.1rem;
-  box-shadow: 0 6px 18px rgba(67, 91, 116, 0.09);
+  box-shadow: var(--shadow);
   transition: border-color 0.2s ease, background-color 0.2s ease, transform 0.2s ease;
   cursor: pointer;
 
@@ -11,7 +11,7 @@
     background-color: var(--surface);
     border-color: var(--border-strong);
     transform: translateY(-2px);
-    box-shadow: 0 10px 24px rgba(67, 91, 116, 0.13);
+    box-shadow: var(--shadow-md);
   }
 }
 
@@ -47,9 +47,9 @@
   }
 
   &.liked {
-    color: var(--accent);
-    border-color: var(--accent);
-    background: var(--accent-soft);
+    color: var(--page-bg);
+    border-color: var(--danger);
+    background: var(--danger);
   }
 
   &.active {
@@ -90,7 +90,7 @@
   background: var(--surface-raised);
   border: 1px solid var(--border);
   border-radius: 12px;
-  box-shadow: 0 12px 28px var(--shadow);
+  box-shadow: var(--shadow-md);
 }
 
 .owner-menu-item {
@@ -124,7 +124,7 @@
   height: 26px;
   border-radius: 50%;
   background: var(--avatar-gradient);
-  color: #fff;
+  color: var(--page-bg);
   font-size: 0.7rem;
   font-weight: 700;
   display: flex;

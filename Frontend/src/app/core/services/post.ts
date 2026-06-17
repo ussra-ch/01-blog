@@ -26,6 +26,13 @@ export class PostService {
     );
   }
 
+  getExplorePosts(page: number, size: number): Observable<Post[]> {
+    return this.http.get<Post[]>(
+      `${this.createPostRoute}/explore?page=${page}&size=${size}`,
+      { withCredentials: true }
+    );
+  }
+
   deletePost(id: number): Observable<void>{
     console.log("Delete clicked:");
     return this.http.delete<void>(

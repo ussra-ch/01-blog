@@ -131,6 +131,15 @@ public class PostService {
                 .toList();
     }
 
+    public List<FeedPostResponse> getExplorePosts(Long currentUserId, int page, int size) {
+        int safePage = Math.max(page, 0);
+        int safeSize = Math.max(1, Math.min(size, 50));
+
+        return postRepository.getExplorePosts(currentUserId, PageRequest.of(safePage, safeSize)).stream()
+                .map(post -> mapToFeedResponse(post, currentUserId))
+                .toList();
+    }
+
     public List<FeedPostResponse> getPostsByUser(Long userId, Long currentUserId) {
         if (!userRepository.existsById(userId)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User does not exist: " + userId);
