@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.ussra._blog.Authentication.FileStorageService;
+import com.ussra._blog.notifications.NotificationService;
 import com.ussra._blog.posts.dto.CommentResponse;
 import com.ussra._blog.posts.dto.CreateCommentRequest;
 import com.ussra._blog.posts.dto.CreatePostRequest;
@@ -34,6 +35,7 @@ public class PostService {
     private final PostCommentRepository postCommentRepository;
     private final FileStorageService fileStorageService;
     private final UserRepository userRepository;
+    private final NotificationService notificationService;
 
     public Post getPostById(Long id) {
         return postRepository.getPostById(id)
@@ -64,7 +66,9 @@ public class PostService {
             }
         }
         post.setUserId(userId);
-        return postRepository.save(post);
+        Post savedPost = postRepository.save(post);
+        notificationService.notifySubscribersAboutNewPost(savedPost);
+        return savedPost;
     }
 
     public Post updatePost(Long id, UpdatePostRequest request, Long userId) throws IOException {

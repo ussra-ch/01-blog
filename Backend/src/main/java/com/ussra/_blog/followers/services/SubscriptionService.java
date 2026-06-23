@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 import jakarta.transaction.Transactional;
 
 import com.ussra._blog.followers.repository.SubscriptionRepository;
+import com.ussra._blog.notifications.NotificationService;
 import com.ussra._blog.User.UserRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -21,6 +22,7 @@ import lombok.RequiredArgsConstructor;
 public class SubscriptionService {
     private final SubscriptionRepository subscriptionRepository;
     private final UserRepository userRepository;
+    private final NotificationService notificationService;
 
     public void follow(Long followerId, Long followingId) {
         if (followerId.equals(followingId)) {
@@ -47,6 +49,7 @@ public class SubscriptionService {
         subscription.setFollowerId(followerId);
         subscription.setFollowingId(followingId);
         subscriptionRepository.save(subscription);
+        notificationService.notifyUserAboutNewFollower(followerId, followingId);
     }
 
     @Transactional

@@ -79,9 +79,10 @@ CREATE TABLE IF NOT EXISTS subscriptions (
 CREATE TABLE IF NOT EXISTS notifications (
     id              BIGSERIAL       PRIMARY KEY,
     user_id         BIGINT          NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-    type            VARCHAR(20)     NOT NULL CHECK (type IN ('NEW_POST', 'NEW_COMMENT', 'NEW_LIKE')),
+    type            VARCHAR(20)     NOT NULL CHECK (type IN ('NEW_POST', 'NEW_COMMENT', 'NEW_LIKE', 'NEW_FOLLOW')),
     message         TEXT            NOT NULL,
     is_read         BOOLEAN         NOT NULL DEFAULT FALSE,
+    actor_user_id   BIGINT          REFERENCES users(id) ON DELETE SET NULL,
     related_post_id BIGINT          REFERENCES posts(id) ON DELETE SET NULL,
     created_at      TIMESTAMP       NOT NULL DEFAULT NOW()
 );
@@ -107,6 +108,9 @@ DELETE FROM reports WHERE reported_user_id IS NULL;
 ALTER TABLE reports ALTER COLUMN reported_user_id SET NOT NULL;
 ALTER TABLE reports DROP COLUMN IF EXISTS reported_post_id;
 ALTER TABLE reports DROP COLUMN IF EXISTS status;
+ALTER TABLE notifications ADD COLUMN IF NOT EXISTS actor_user_id BIGINT REFERENCES users(id) ON DELETE SET NULL;
+ALTER TABLE notifications DROP CONSTRAINT IF EXISTS notifications_type_check;
+ALTER TABLE notifications ADD CONSTRAINT notifications_type_check CHECK (type IN ('NEW_POST', 'NEW_COMMENT', 'NEW_LIKE', 'NEW_FOLLOW'));
 
 
 -- -------------------------------------------------------------

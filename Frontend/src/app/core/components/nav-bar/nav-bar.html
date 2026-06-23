@@ -73,21 +73,85 @@
       </form>
 
       <!-- Notifs -->
-      <button class="btn-icon" title="Notifications">
-      <svg
-        width="20"
-        height="20"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-      >
-        <path d="M15 17h5l-1.4-1.4A2 2 0 0 1 18 14.2V11a6 6 0 1 0-12 0v3.2a2 2 0 0 1-.6 1.4L4 17h5"></path>
-        <path d="M9 17a3 3 0 0 0 6 0"></path>
-      </svg>
-    </button>
+      <div class="notification-wrapper">
+        <button
+          class="btn-icon notification-button"
+          type="button"
+          title="Notifications"
+          aria-label="Notifications"
+          [attr.aria-expanded]="notificationsOpen"
+          (click)="toggleNotifications()">
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M15 17h5l-1.4-1.4A2 2 0 0 1 18 14.2V11a6 6 0 1 0-12 0v3.2a2 2 0 0 1-.6 1.4L4 17h5"></path>
+            <path d="M9 17a3 3 0 0 0 6 0"></path>
+          </svg>
+          <span *ngIf="unreadCount() > 0" class="notification-badge">
+            {{ unreadCount() > 9 ? '9+' : unreadCount() }}
+          </span>
+        </button>
+
+        <div *ngIf="notificationsOpen" class="notifications-panel">
+          <div class="notifications-header">
+            <span>Notifications</span>
+            <button
+              type="button"
+              class="notification-link"
+              [disabled]="unreadCount() === 0"
+              (click)="markAllNotificationsRead($event)">
+              Mark all read
+            </button>
+          </div>
+
+          <div *ngIf="notifications().length === 0" class="notification-empty">
+            No updates yet
+          </div>
+
+          <div
+            *ngFor="let notification of notifications(); trackBy: trackNotification"
+            class="notification-item"
+            role="button"
+            tabindex="0"
+            [class.unread]="!notification.read"
+            (click)="openNotification(notification)"
+            (keydown.enter)="openNotificationFromKeyboard(notification, $event)"
+            (keydown.space)="openNotificationFromKeyboard(notification, $event)">
+            <img
+              [src]="getNotificationAvatar(notification)"
+              [alt]="notification.actorUsername || 'Profile'"
+              class="notification-avatar"
+            />
+            <span class="notification-copy">
+              <span class="notification-message">{{ notification.message }}</span>
+              <span class="notification-time">{{ notification.createdAt | date:'short' }}</span>
+            </span>
+            <span class="notification-actions">
+              <button
+                *ngIf="!notification.read"
+                type="button"
+                class="notification-link"
+                (click)="markNotificationRead(notification, $event)">
+                Read
+              </button>
+              <button
+                *ngIf="notification.read"
+                type="button"
+                class="notification-link"
+                (click)="markNotificationUnread(notification, $event)">
+                Unread
+              </button>
+            </span>
+          </div>
+        </div>
+      </div>
 
       <!-- Profile -->
       <div class="dropdown">

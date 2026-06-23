@@ -35,7 +35,16 @@ export class UserProfileService {
   }
 
   getAvatarUrl(avatarUrl: string | null): string | null {
-    return avatarUrl ? `http://localhost:8080/${avatarUrl}` : null;
+    if (!avatarUrl) {
+      return null;
+    }
+
+    if (avatarUrl.startsWith('http://') || avatarUrl.startsWith('https://')) {
+      return avatarUrl;
+    }
+
+    const normalizedPath = avatarUrl.startsWith('/') ? avatarUrl : `/${avatarUrl}`;
+    return encodeURI(`http://localhost:8080${normalizedPath}`);
   }
 
   loadCurrentAvatar(userId: number): void {

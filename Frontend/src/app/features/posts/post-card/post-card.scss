@@ -1,11 +1,20 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
 .post-card {
+  display: flex;
+  width: 100%;
+  min-height: 190px;
   background-color: var(--surface-raised);
   border: 1px solid var(--border);
-  border-radius: 20px;
-  padding: 1rem 1.1rem;
+  border-radius: 18px;
+  padding: 1.35rem 1.45rem;
   box-shadow: var(--shadow);
   transition: border-color 0.2s ease, background-color 0.2s ease, transform 0.2s ease;
   cursor: pointer;
+  min-width: 0;
 
   &:hover {
     background-color: var(--surface);
@@ -160,11 +169,14 @@
 
 // ── Post body ─────────────────────────────────────────────────
 .post-body {
+  display: flex;
+  flex-direction: column;
+  align-self: stretch;
   overflow: hidden;
 }
 
 .post-title {
-  font-size: 1.1rem;
+  font-size: 1.28rem;
   font-weight: 700;
   color: var(--text-primary);
   line-height: 1.35;
@@ -200,7 +212,7 @@
   align-items: center;
   font-size: 0.72rem;
   color: var(--text-muted);
-  margin: 0;
+  margin: auto 0 0;
 
   svg {
     opacity: 0.6;
@@ -210,10 +222,10 @@
 // ── Thumbnail ─────────────────────────────────────────────────
 .post-thumbnail {
   flex-shrink: 0;
-  width: 170px;
-  height: 116px;
-  max-width: 170px;
-  max-height: 116px;
+  width: clamp(150px, 20vw, 240px);
+  height: 150px;
+  max-width: 240px;
+  max-height: 150px;
   border-radius: 14px;
   overflow: hidden;
   border: 1px solid var(--border);
@@ -226,12 +238,6 @@
     display: block;
   }
 
-  @media (max-width: 480px) {
-    width: 96px;
-    height: 68px;
-    max-width: 96px;
-    max-height: 68px;
-  }
 }
 
 .post-side {
@@ -242,8 +248,25 @@
   flex-shrink: 0;
 }
 
-@media (max-width: 620px) {
+@media (max-width: 760px) {
   .post-card {
+    min-height: 165px;
+    padding: 1rem;
+  }
+
+  .post-title {
+    font-size: 1.12rem;
+  }
+
+  .post-thumbnail {
+    width: 128px;
+    height: 96px;
+  }
+}
+
+@media (max-width: 560px) {
+  .post-card {
+    min-height: 150px;
     gap: 0.75rem !important;
     padding: 0.9rem;
     border-radius: 16px;
@@ -269,6 +292,22 @@
   .action-btn {
     width: 34px;
     min-height: 34px;
+  }
+}
+
+@media (max-width: 380px) {
+  .post-card {
+    gap: 0.6rem !important;
+    padding: 0.75rem;
+  }
+
+  .action-btn {
+    width: 32px;
+    min-height: 32px;
+  }
+
+  .post-title {
+    font-size: 1rem;
   }
 }
 // ── Utility ───────────────────────────────────────────────────
