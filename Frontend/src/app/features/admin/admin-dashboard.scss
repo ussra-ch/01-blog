@@ -38,10 +38,10 @@ button { font: inherit; cursor: pointer; }
 .actions .action-button.success:hover:not(:disabled) { background: var(--accent-hover); }
 .actions .action-button.neutral { color: var(--text-secondary); background: var(--page-bg-soft); border-color: var(--border-strong); }
 button:disabled { cursor: wait; opacity: .55; }
-.avatar { display: grid; place-items: center; width: 42px; height: 42px; flex: 0 0 42px; color: var(--page-bg); background: var(--avatar-gradient); border-radius: 50%; font-weight: 800; }
+.avatar { display: grid; place-items: center; width: 42px; height: 42px; flex: 0 0 42px; color: var(--avatar-text); background: var(--avatar-bg); border-radius: 50%; font-weight: 800; }
 .error-banner { padding: .8rem 1rem; color: var(--danger); background: var(--danger-soft); border-radius: 10px; }
 .loading-card, .empty { padding: 3rem; color: var(--text-secondary); text-align: center; }
-@media (max-width: 700px) {
+@media (max-width: 920px) {
   .admin-page { width: min(100% - 1rem, 1120px); padding-top: 1rem; }
   .admin-header { align-items: start; flex-direction: column; }
   .metrics { grid-template-columns: 1fr; }

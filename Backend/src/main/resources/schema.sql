@@ -94,19 +94,31 @@ CREATE TABLE IF NOT EXISTS notifications (
 CREATE TABLE IF NOT EXISTS reports (
     id                  BIGSERIAL       PRIMARY KEY,
     reporter_id         BIGINT          NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-    reported_user_id    BIGINT          NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    reported_user_id    BIGINT          REFERENCES users(id) ON DELETE CASCADE,
+    reported_post_id    BIGINT          REFERENCES posts(id) ON DELETE CASCADE,
     reason              TEXT            NOT NULL,
     created_at          TIMESTAMP       NOT NULL DEFAULT NOW(),
 
-    CONSTRAINT no_self_report CHECK (reporter_id <> reported_user_id)
+    CONSTRAINT one_report_target CHECK (
+        (reported_user_id IS NOT NULL AND reported_post_id IS NULL)
+        OR (reported_user_id IS NULL AND reported_post_id IS NOT NULL)
+    ),
+    CONSTRAINT no_self_profile_report CHECK (reported_user_id IS NULL OR reporter_id <> reported_user_id)
 );
 
 ALTER TABLE posts ADD COLUMN IF NOT EXISTS is_hidden BOOLEAN NOT NULL DEFAULT FALSE;
 ALTER TABLE reports DROP CONSTRAINT IF EXISTS unique_report;
 ALTER TABLE reports DROP CONSTRAINT IF EXISTS one_report_target;
-DELETE FROM reports WHERE reported_user_id IS NULL;
-ALTER TABLE reports ALTER COLUMN reported_user_id SET NOT NULL;
-ALTER TABLE reports DROP COLUMN IF EXISTS reported_post_id;
+ALTER TABLE reports DROP CONSTRAINT IF EXISTS no_self_report;
+ALTER TABLE reports DROP CONSTRAINT IF EXISTS no_self_profile_report;
+ALTER TABLE reports ADD COLUMN IF NOT EXISTS reported_post_id BIGINT REFERENCES posts(id) ON DELETE CASCADE;
+ALTER TABLE reports ALTER COLUMN reported_user_id DROP NOT NULL;
+DELETE FROM reports WHERE reported_user_id IS NULL AND reported_post_id IS NULL;
+ALTER TABLE reports ADD CONSTRAINT one_report_target CHECK (
+    (reported_user_id IS NOT NULL AND reported_post_id IS NULL)
+    OR (reported_user_id IS NULL AND reported_post_id IS NOT NULL)
+);
+ALTER TABLE reports ADD CONSTRAINT no_self_profile_report CHECK (reported_user_id IS NULL OR reporter_id <> reported_user_id);
 ALTER TABLE reports DROP COLUMN IF EXISTS status;
 ALTER TABLE notifications ADD COLUMN IF NOT EXISTS actor_user_id BIGINT REFERENCES users(id) ON DELETE SET NULL;
 ALTER TABLE notifications DROP CONSTRAINT IF EXISTS notifications_type_check;
@@ -122,3 +134,6 @@ CREATE INDEX IF NOT EXISTS idx_likes_post_id         ON likes(post_id);
 CREATE INDEX IF NOT EXISTS idx_subscriptions_follower ON subscriptions(follower_id);
 CREATE INDEX IF NOT EXISTS idx_notifications_user_id ON notifications(user_id);
 CREATE INDEX IF NOT EXISTS idx_reports_reported_user ON reports(reported_user_id);
+CREATE INDEX IF NOT EXISTS idx_reports_reported_post ON reports(reported_post_id);
+CREATE UNIQUE INDEX IF NOT EXISTS unique_profile_report ON reports(reporter_id, reported_user_id) WHERE reported_user_id IS NOT NULL;
+CREATE UNIQUE INDEX IF NOT EXISTS unique_post_report ON reports(reporter_id, reported_post_id) WHERE reported_post_id IS NOT NULL;

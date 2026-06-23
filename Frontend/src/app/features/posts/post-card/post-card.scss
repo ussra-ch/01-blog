@@ -11,7 +11,7 @@
   border: 1px solid var(--border);
   border-radius: 18px;
   padding: 1.35rem 1.45rem;
-  box-shadow: var(--shadow);
+  box-shadow: var(--post-card-shadow);
   transition: border-color 0.2s ease, background-color 0.2s ease, transform 0.2s ease;
   cursor: pointer;
   min-width: 0;
@@ -20,7 +20,7 @@
     background-color: var(--surface);
     border-color: var(--border-strong);
     transform: translateY(-2px);
-    box-shadow: var(--shadow-md);
+    box-shadow: var(--post-card-shadow);
   }
 }
 
@@ -65,6 +65,12 @@
     color: var(--accent-hover);
     border-color: var(--accent);
     background: var(--accent-soft);
+  }
+
+  &.report-btn:hover {
+    color: var(--danger);
+    border-color: var(--danger);
+    background: var(--danger-soft);
   }
 
   &:disabled {
@@ -132,8 +138,8 @@
   width: 26px;
   height: 26px;
   border-radius: 50%;
-  background: var(--avatar-gradient);
-  color: var(--page-bg);
+  background: var(--avatar-bg);
+  color: var(--avatar-text);
   font-size: 0.7rem;
   font-weight: 700;
   display: flex;
@@ -231,7 +237,8 @@
   border: 1px solid var(--border);
   background: var(--page-bg-soft);
 
-  img {
+  img,
+  video {
     width: 100%;
     height: 100%;
     object-fit: cover;
@@ -248,7 +255,7 @@
   flex-shrink: 0;
 }
 
-@media (max-width: 760px) {
+@media (max-width: 920px) {
   .post-card {
     min-height: 165px;
     padding: 1rem;

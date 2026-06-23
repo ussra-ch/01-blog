@@ -11,13 +11,15 @@ spring:
   jpa:
     hibernate:
       ddl-auto: none
-      show-sql: true
+    show-sql: false
   servlet:
     multipart:
-      max-file-size: 10MB
-      max-request-size: 10MB
+      max-file-size: 1024MB
+      max-request-size: 1024MB
 server:
   port: 8080
+  tomcat:
+    max-swallow-size: 1024MB
 security:
   jwt:
     secret-key: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
@@ -26,6 +28,6 @@ logging:
   level:
     org:
       springframework:
-        security: DEBUG
+        security: INFO
 file:
   upload-dir: uploads/avatars

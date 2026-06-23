@@ -94,7 +94,14 @@ public class AdminService {
         String reporter = userRepository.findById(report.getReporterId()).map(User::getUsername).orElse("Deleted user");
         String reportedUser = report.getReportedUserId() == null ? null
                 : userRepository.findById(report.getReportedUserId()).map(User::getUsername).orElse("Deleted user");
+        Post reportedPost = report.getReportedPostId() == null ? null
+                : postRepository.findById(report.getReportedPostId()).orElse(null);
+        Long reportedPostAuthorId = reportedPost == null ? null : reportedPost.getUserId();
+        String reportedPostAuthor = reportedPostAuthorId == null ? null
+                : userRepository.findById(reportedPostAuthorId).map(User::getUsername).orElse("Deleted user");
+        String reportedPostTitle = reportedPost == null ? null : reportedPost.getTitle();
         return new AdminReportResponse(report.getId(), report.getReporterId(), reporter, report.getReportedUserId(),
-                reportedUser, report.getReason(), report.getCreatedAt());
+                reportedUser, report.getReportedPostId(), reportedPostAuthorId, reportedPostAuthor,
+                reportedPostTitle, report.getReason(), report.getCreatedAt());
     }
 }

@@ -3,6 +3,7 @@ export interface Post {
   title: string;
   description: string | null;
   mediaUrl: string | null;
+  mediaType: 'IMAGE' | 'VIDEO' | null;
   createdAt: string;
   likeCount: number;
   commentCount: number;

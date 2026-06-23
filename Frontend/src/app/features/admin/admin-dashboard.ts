@@ -71,7 +71,9 @@ export class AdminDashboard implements OnInit {
         this.users.update(users => users.filter(item => item.id !== user.id));
         this.posts.update(posts => posts.filter(post => post.userId !== user.id));
         this.reports.update(reports => reports.filter(report =>
-          report.reporterId !== user.id && report.reportedUserId !== user.id
+          report.reporterId !== user.id
+          && report.reportedUserId !== user.id
+          && report.reportedPostAuthorId !== user.id
         ));
         this.busyKey.set('');
       },
@@ -96,6 +98,7 @@ export class AdminDashboard implements OnInit {
     this.adminService.deletePost(post.id).subscribe({
       next: () => {
         this.posts.update(posts => posts.filter(item => item.id !== post.id));
+        this.reports.update(reports => reports.filter(report => report.reportedPostId !== post.id));
         this.busyKey.set('');
       },
       error: () => this.actionFailed()
@@ -114,7 +117,13 @@ export class AdminDashboard implements OnInit {
   }
 
   reportUser(report: AdminReport): AdminUser | undefined {
+    if (report.reportedUserId === null) return undefined;
     return this.users().find(user => user.id === report.reportedUserId);
+  }
+
+  reportPost(report: AdminReport): AdminPost | undefined {
+    if (report.reportedPostId === null) return undefined;
+    return this.posts().find(post => post.id === report.reportedPostId);
   }
 
   isBusy(key: string): boolean {

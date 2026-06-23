@@ -21,6 +21,7 @@ interface ExploreSection {
 })
 export class Explore implements OnInit {
   readonly DEFAULT_COVER = 'assets/images/default-cover.png';
+  readonly VIDEO_THUMBNAIL = '/video.png';
 
   @ViewChild('scrollTrigger') scrollTrigger!: ElementRef;
 
@@ -95,6 +96,10 @@ export class Explore implements OnInit {
   }
 
   coverUrl(post: Post): string {
+    if (post.mediaType === 'VIDEO') {
+      return this.VIDEO_THUMBNAIL;
+    }
+
     return this.mediaUrl(post) ?? this.DEFAULT_COVER;
   }
 

@@ -12,7 +12,7 @@
 
   <section class="metrics">
     <button type="button" [class.active]="activeTab() === 'reports'" (click)="setTab('reports')">
-      <span>Profile reports</span><strong>{{ openReportCount() }}</strong>
+      <span>Reports</span><strong>{{ openReportCount() }}</strong>
     </button>
     <button type="button" [class.active]="activeTab() === 'users'" (click)="setTab('users')">
       <span>Users</span><strong>{{ users().length }}</strong>
@@ -26,19 +26,23 @@
   <div class="loading-card" *ngIf="loading()">Loading moderation queue...</div>
 
   <section class="panel" *ngIf="!loading() && activeTab() === 'reports'">
-    <div class="panel-heading"><div><span>Admin only</span><h2>Submitted profile reports</h2></div></div>
+    <div class="panel-heading"><div><span>Admin only</span><h2>Submitted reports</h2></div></div>
     <div class="card-list">
       <article class="moderation-card" *ngFor="let report of reports()">
         <div class="card-main">
           <div class="card-title">
-            <strong>@{{ report.reportedUser }}</strong>
-            <span class="badge open">PROFILE REPORT</span>
+            <strong *ngIf="report.reportedUserId">@{{ report.reportedUser }}</strong>
+            <strong *ngIf="report.reportedPostId">{{ report.reportedPostTitle || 'Deleted post' }}</strong>
+            <span class="badge open">{{ report.reportedPostId ? 'POST REPORT' : 'PROFILE REPORT' }}</span>
           </div>
           <div class="report-reason">
             <span>Submitted reason</span>
             <p>{{ report.reason }}</p>
           </div>
-          <small>Reported by @{{ report.reporter }} · {{ report.createdAt | date:'medium' }}</small>
+          <small *ngIf="report.reportedUserId">Reported by @{{ report.reporter }} · {{ report.createdAt | date:'medium' }}</small>
+          <small *ngIf="report.reportedPostId">
+            Post by @{{ report.reportedPostAuthor || 'Deleted user' }} · Reported by @{{ report.reporter }} · {{ report.createdAt | date:'medium' }}
+          </small>
         </div>
         <div class="actions">
           <ng-container *ngIf="reportUser(report) as user">
@@ -48,6 +52,15 @@
             </button>
             <button *ngIf="user.role !== 'ADMIN'" type="button" class="action-button danger" [disabled]="isBusy('user-' + user.id)" (click)="deleteUser(user)">
               <span aria-hidden="true">×</span> Delete User
+            </button>
+          </ng-container>
+          <ng-container *ngIf="reportPost(report) as post">
+            <button type="button" class="action-button warning" [disabled]="isBusy('post-' + post.id)" (click)="toggleHide(post)">
+              <span aria-hidden="true">{{ post.hidden ? '+' : '-' }}</span>
+              {{ post.hidden ? 'Show Post' : 'Hide Post' }}
+            </button>
+            <button type="button" class="action-button danger" [disabled]="isBusy('post-' + post.id)" (click)="deletePost(post)">
+              <span aria-hidden="true">×</span> Delete Post
             </button>
           </ng-container>
           <button type="button" class="action-button neutral" [disabled]="isBusy('report-' + report.id)" (click)="removeReport(report)">

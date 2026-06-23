@@ -1,6 +1,10 @@
 package com.ussra._blog.posts.services;
 
 import java.io.IOException;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -51,7 +55,6 @@ public class PostService {
         Post post = new Post();
         post.setTitle(request.getTitle());
         post.setDescription(request.getDescription());
-        System.out.println("MEDIAAA FILE IS : " + request.getMediaFile());
 
         if (request.getMediaFile() != null && !request.getMediaFile().isEmpty()) {
             if (request.getMediaFile().getContentType().equals("image/jpeg")
@@ -123,25 +126,18 @@ public class PostService {
     }
 
     public List<FeedPostResponse> getFeedPosts(Long currentUserId, int page, int size) {
-        // System.out.println("befooooooooore");
         int safePage = Math.max(page, 0);
         int safeSize = Math.max(1, Math.min(size, 50));
         List<Post> posts = postRepository.getFeedPosts(currentUserId, PageRequest.of(safePage, safeSize));
-        // System.out.println("afteeeeeeeeeer");
-        // System.out.println("afteeeeeeeeeer :::");
-        // System.out.println(posts);
-        return posts.stream()
-                .map(post -> mapToFeedResponse(post, currentUserId))
-                .toList();
+        return mapToFeedResponses(posts, currentUserId);
     }
 
     public List<FeedPostResponse> getExplorePosts(Long currentUserId, int page, int size) {
         int safePage = Math.max(page, 0);
         int safeSize = Math.max(1, Math.min(size, 50));
 
-        return postRepository.getExplorePosts(currentUserId, PageRequest.of(safePage, safeSize)).stream()
-                .map(post -> mapToFeedResponse(post, currentUserId))
-                .toList();
+        List<Post> posts = postRepository.getExplorePosts(currentUserId, PageRequest.of(safePage, safeSize));
+        return mapToFeedResponses(posts, currentUserId);
     }
 
     public List<FeedPostResponse> getPostsByUser(Long userId, Long currentUserId) {
@@ -149,9 +145,8 @@ public class PostService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User does not exist: " + userId);
         }
 
-        return postRepository.findAllByUserIdAndIsHiddenFalseOrderByCreatedAtDesc(userId).stream()
-                .map(post -> mapToFeedResponse(post, currentUserId))
-                .toList();
+        List<Post> posts = postRepository.findAllByUserIdAndIsHiddenFalseOrderByCreatedAtDesc(userId);
+        return mapToFeedResponses(posts, currentUserId);
     }
 
     public long countPostsByUser(Long userId) {
@@ -199,23 +194,60 @@ public class PostService {
         return mapToCommentResponse(postCommentRepository.save(comment));
     }
 
-    private FeedPostResponse mapToFeedResponse(Post post, Long currentUserId) {
+    private List<FeedPostResponse> mapToFeedResponses(List<Post> posts, Long currentUserId) {
+        if (posts.isEmpty()) {
+            return List.of();
+        }
+
+        List<Long> postIds = posts.stream().map(Post::getId).toList();
+        List<Long> userIds = posts.stream().map(Post::getUserId).distinct().toList();
+
+        Map<Long, User> usersById = userRepository.findAllById(userIds).stream()
+                .collect(Collectors.toMap(User::getId, Function.identity()));
+        Map<Long, Long> likeCounts = postLikeRepository.countByPostIds(postIds).stream()
+                .collect(Collectors.toMap(
+                        PostLikeRepository.PostCountView::getPostId,
+                        PostLikeRepository.PostCountView::getTotal
+                ));
+        Map<Long, Long> commentCounts = postCommentRepository.countByPostIds(postIds).stream()
+                .collect(Collectors.toMap(
+                        PostCommentRepository.PostCountView::getPostId,
+                        PostCommentRepository.PostCountView::getTotal
+                ));
+        Set<Long> likedPostIds = currentUserId == null
+                ? Set.of()
+                : Set.copyOf(postLikeRepository.findLikedPostIds(currentUserId, postIds));
+
+        return posts.stream()
+                .map(post -> mapToFeedResponse(post, usersById, likeCounts, commentCounts, likedPostIds))
+                .toList();
+    }
+
+    private FeedPostResponse mapToFeedResponse(
+            Post post,
+            Map<Long, User> usersById,
+            Map<Long, Long> likeCounts,
+            Map<Long, Long> commentCounts,
+            Set<Long> likedPostIds) {
             FeedPostResponse response = new FeedPostResponse();
             response.setPostId(post.getId());
             response.setDescription(post.getDescription());
             response.setMediaUrl(post.getMediaUrl());
+            response.setMediaType(post.getMediaType());
             response.setCreatedAt(post.getCreatedAt());
             response.setTitle(post.getTitle());
-            User user = userRepository.findById(post.getUserId())
-                        .orElseThrow();
+            User user = usersById.get(post.getUserId());
+            if (user == null) {
+                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Post author not found: " + post.getUserId());
+            }
             UserSummaryResponse author = new UserSummaryResponse();
             author.setId(user.getId());
             author.setUsername(user.getUsername());
             author.setProfilePicture(user.getAvatarUrl());
             response.setAuthor(author);
-            response.setLikeCount(postLikeRepository.countByPostId(post.getId()));
-            response.setLikedByCurrentUser(postLikeRepository.existsByPostIdAndUserId(post.getId(), currentUserId));
-            response.setCommentCount(postCommentRepository.countByPostId(post.getId()));
+            response.setLikeCount(Math.toIntExact(likeCounts.getOrDefault(post.getId(), 0L)));
+            response.setLikedByCurrentUser(likedPostIds.contains(post.getId()));
+            response.setCommentCount(Math.toIntExact(commentCounts.getOrDefault(post.getId(), 0L)));
             response.setComments(new String[0]);
             return response;
         }

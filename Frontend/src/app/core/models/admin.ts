@@ -23,8 +23,12 @@ export interface AdminReport {
   id: number;
   reporterId: number;
   reporter: string;
-  reportedUserId: number;
-  reportedUser: string;
+  reportedUserId: number | null;
+  reportedUser: string | null;
+  reportedPostId: number | null;
+  reportedPostAuthorId: number | null;
+  reportedPostAuthor: string | null;
+  reportedPostTitle: string | null;
   reason: string;
   createdAt: string;
 }

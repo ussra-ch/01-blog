@@ -27,6 +27,9 @@ public class Report {
     @Column(name = "reported_user_id")
     private Long reportedUserId;
 
+    @Column(name = "reported_post_id")
+    private Long reportedPostId;
+
     private String reason;
 
     @Column(name = "created_at")

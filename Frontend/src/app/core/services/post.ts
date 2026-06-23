@@ -71,6 +71,14 @@ export class PostService {
     );
   }
 
+  reportPost(postId: number, reason: string): Observable<void> {
+    return this.http.post<void>(
+      'http://localhost:8080/api/reports',
+      { postId, reason },
+      { withCredentials: true }
+    );
+  }
+
   createPost(data: FormData) {
     return this.http.post(this.createPostRoute, data, {
       withCredentials: true

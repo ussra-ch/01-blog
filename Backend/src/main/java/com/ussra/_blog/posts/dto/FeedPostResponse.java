@@ -10,6 +10,7 @@ public class FeedPostResponse {
     private String title;
     private String description;
     private String mediaUrl;
+    private String mediaType;
     private LocalDateTime createdAt;
     private int likeCount;
     private int commentCount;

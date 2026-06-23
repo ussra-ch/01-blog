@@ -24,6 +24,8 @@ export interface UserSummary {
   styleUrls: ['./post-card.scss']
 })
 export class PostCardComponent {
+  readonly VIDEO_THUMBNAIL = '/video.png';
+
   @Output() openPost = new EventEmitter<Post>();
   @Input() post!: Post;
   @Output() editPost = new EventEmitter<Post>();
@@ -34,6 +36,7 @@ export class PostCardComponent {
   private postService = inject(PostService);
   voting = false;
   ownerMenuOpen = false;
+  reporting = false;
 
   get formattedDate(): string {
     return new Date(this.post.createdAt).toLocaleString('en-US', {
@@ -111,7 +114,43 @@ export class PostCardComponent {
     }
   }
 
+  reportPost(event: MouseEvent): void {
+    event.stopPropagation();
+    if (this.isOwner || this.reporting) return;
+
+    const reason = window.prompt(`Report "${this.post.title}"\n\nTell the admin team what is wrong with this post.`);
+    const trimmedReason = reason?.trim();
+    if (reason === null) return;
+    if (!trimmedReason) {
+      window.alert('Please include a reason before submitting a report.');
+      return;
+    }
+    if (!window.confirm('Submit this post report to the admin moderation team?')) return;
+
+    this.reporting = true;
+    this.postService.reportPost(this.post.postId, trimmedReason).subscribe({
+      next: () => {
+        this.reporting = false;
+        window.alert('Report submitted.');
+      },
+      error: (error) => {
+        this.reporting = false;
+        window.alert(error.status === 409
+          ? 'You already reported this post.'
+          : 'The report could not be submitted. Please try again.');
+      }
+    });
+  }
+
   get comments(): number {
     return this.post.commentCount ?? 0;
+  }
+
+  get mediaSrc(): string | null {
+    return this.post.mediaUrl ? `http://localhost:8080/${this.post.mediaUrl}` : null;
+  }
+
+  get hasVideo(): boolean {
+    return this.post.mediaType === 'VIDEO';
   }
 }

@@ -9,6 +9,7 @@ import lombok.Setter;
 @Setter
 public class CreateReportRequest {
     private Long userId;
+    private Long postId;
 
     @NotBlank
     @Size(max = 1000)

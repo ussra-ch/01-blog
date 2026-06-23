@@ -8,6 +8,10 @@ public record AdminReportResponse(
         String reporter,
         Long reportedUserId,
         String reportedUser,
+        Long reportedPostId,
+        Long reportedPostAuthorId,
+        String reportedPostAuthor,
+        String reportedPostTitle,
         String reason,
         LocalDateTime createdAt) {
 }

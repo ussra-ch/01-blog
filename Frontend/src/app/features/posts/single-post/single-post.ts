@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Comment, Post } from '../../../core/models/post';
 import { PostService } from '../../../core/services/post';
+import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
   selector: 'app-single-post',
@@ -18,12 +19,14 @@ export class SinglePost implements OnInit {
   @Output() commentAdded = new EventEmitter<Comment>();
 
   private postService = inject(PostService);
+  private authService = inject(AuthService);
 
   newComment = '';
   comments: Comment[] = [];
   loadingComments = false;
   submitting = false;
   liking = false;
+  reporting = false;
   liked = false;
   localLikes = 0;
 
@@ -73,6 +76,33 @@ export class SinglePost implements OnInit {
         this.post.likedByCurrentUser = previousLiked;
         this.post.likeCount = previousLikeCount;
         this.liking = false;
+      }
+    });
+  }
+
+  reportPost(): void {
+    if (this.isOwner || this.reporting) return;
+
+    const reason = window.prompt(`Report "${this.post.title}"\n\nTell the admin team what is wrong with this post.`);
+    const trimmedReason = reason?.trim();
+    if (reason === null) return;
+    if (!trimmedReason) {
+      window.alert('Please include a reason before submitting a report.');
+      return;
+    }
+    if (!window.confirm('Submit this post report to the admin moderation team?')) return;
+
+    this.reporting = true;
+    this.postService.reportPost(this.post.postId, trimmedReason).subscribe({
+      next: () => {
+        this.reporting = false;
+        window.alert('Report submitted.');
+      },
+      error: (error) => {
+        this.reporting = false;
+        window.alert(error.status === 409
+          ? 'You already reported this post.'
+          : 'The report could not be submitted. Please try again.');
       }
     });
   }
@@ -140,5 +170,17 @@ export class SinglePost implements OnInit {
   get readTime(): string {
     const words = (this.post.description ?? '').split(' ').length;
     return `${Math.max(1, Math.ceil(words / 200))} min read`;
+  }
+
+  get isOwner(): boolean {
+    return this.authService.currentUserId === this.post.author.id;
+  }
+
+  get mediaSrc(): string | null {
+    return this.post.mediaUrl ? `http://localhost:8080/${this.post.mediaUrl}` : null;
+  }
+
+  get hasVideo(): boolean {
+    return this.post.mediaType === 'VIDEO';
   }
 }
