@@ -6,6 +6,10 @@
 
     <form [formGroup]="postForm" (ngSubmit)="onSubmit()">
 
+      <div *ngIf="errorMessage" class="error-message">
+        {{ errorMessage }}
+      </div>
+
       <!-- TITLE -->
       <div class="form-group">
         <label>Title</label>

@@ -7,6 +7,7 @@ import { Post, PostLikeResponse } from '../../core/models/post';
 import { PostService } from '../../core/services/post';
 import { SinglePost } from '../posts/single-post/single-post';
 import { MediaUrlService } from '../../core/services/media-url';
+import { backendErrorMessage } from '../../core/utils/backend-error';
 
 interface ExploreSection {
   cards: Post[];
@@ -34,6 +35,7 @@ export class Explore implements OnInit {
 
   posts = signal<Post[]>([]);
   loading = signal(false);
+  error = signal('');
   selectedPost: Post | null = null;
   likingPostIds = signal<number[]>([]);
 
@@ -46,6 +48,7 @@ export class Explore implements OnInit {
     if (this.loading() || this.reachedEnd) return;
 
     this.loading.set(true);
+    this.error.set('');
     this.postService.getExplorePosts(this.page, this.pageSize).subscribe({
       next: posts => {
         this.posts.update(current => [...current, ...posts]);
@@ -54,7 +57,7 @@ export class Explore implements OnInit {
         this.loading.set(false);
       },
       error: (err: HttpErrorResponse) => {
-        console.error('Failed to load explore posts', err);
+        this.error.set(backendErrorMessage(err, 'Explore posts could not be loaded.'));
         this.loading.set(false);
       }
     });
@@ -81,7 +84,8 @@ export class Explore implements OnInit {
         this.applyLikeResponse(response);
         this.likingPostIds.update(ids => ids.filter(id => id !== post.postId));
       },
-      error: () => {
+      error: (err: unknown) => {
+        this.error.set(backendErrorMessage(err, 'Your like could not be saved. Please try again.'));
         post.likedByCurrentUser = previousLiked;
         post.likeCount = previousLikeCount;
         this.likingPostIds.update(ids => ids.filter(id => id !== post.postId));

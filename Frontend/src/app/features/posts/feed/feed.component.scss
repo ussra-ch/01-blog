@@ -22,6 +22,16 @@
   width: 100%;
 }
 
+.error-banner {
+  margin-bottom: 1rem;
+  padding: 0.85rem 1rem;
+  color: var(--danger);
+  background: var(--danger-soft);
+  border: 1px solid rgba(190, 18, 60, 0.2);
+  border-radius: 10px;
+  font-weight: 700;
+}
+
 .posts-list {
   display: grid;
   gap: 1rem;

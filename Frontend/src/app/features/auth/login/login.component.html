@@ -8,6 +8,10 @@
 
     <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
 
+      <div class="alert alert-danger py-2" *ngIf="errorMessage">
+        {{ errorMessage }}
+      </div>
+
       <div class="mb-3">
         <label class="form-label fw-medium">Username</label>
         <input formControlName="username" type="text" class="form-control" required>

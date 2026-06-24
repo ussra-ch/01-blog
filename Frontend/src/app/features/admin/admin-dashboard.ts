@@ -3,6 +3,7 @@ import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { NavBar } from '../../core/components/nav-bar/nav-bar';
 import { AdminPost, AdminReport, AdminUser } from '../../core/models/admin';
 import { AdminService } from '../../core/services/admin';
+import { backendErrorMessage } from '../../core/utils/backend-error';
 
 type AdminTab = 'users' | 'posts' | 'reports';
 
@@ -37,8 +38,8 @@ export class AdminDashboard implements OnInit {
       completed++;
       if (completed === 3) this.loading.set(false);
     };
-    const failed = () => {
-      this.error.set('Some moderation data could not be loaded.');
+    const failed = (err: unknown) => {
+      this.error.set(backendErrorMessage(err, 'Some moderation data could not be loaded.'));
       done();
     };
 
@@ -59,7 +60,7 @@ export class AdminDashboard implements OnInit {
         this.users.update(users => users.map(item => item.id === updated.id ? updated : item));
         this.busyKey.set('');
       },
-      error: () => this.actionFailed()
+      error: (err: unknown) => this.actionFailed(err)
     });
   }
 
@@ -77,7 +78,7 @@ export class AdminDashboard implements OnInit {
         ));
         this.busyKey.set('');
       },
-      error: () => this.actionFailed()
+      error: (err: unknown) => this.actionFailed(err)
     });
   }
 
@@ -88,7 +89,7 @@ export class AdminDashboard implements OnInit {
         this.posts.update(posts => posts.map(item => item.id === updated.id ? updated : item));
         this.busyKey.set('');
       },
-      error: () => this.actionFailed()
+      error: (err: unknown) => this.actionFailed(err)
     });
   }
 
@@ -101,7 +102,7 @@ export class AdminDashboard implements OnInit {
         this.reports.update(reports => reports.filter(report => report.reportedPostId !== post.id));
         this.busyKey.set('');
       },
-      error: () => this.actionFailed()
+      error: (err: unknown) => this.actionFailed(err)
     });
   }
 
@@ -112,7 +113,7 @@ export class AdminDashboard implements OnInit {
         this.reports.update(reports => reports.filter(item => item.id !== report.id));
         this.busyKey.set('');
       },
-      error: () => this.actionFailed()
+      error: (err: unknown) => this.actionFailed(err)
     });
   }
 
@@ -130,8 +131,8 @@ export class AdminDashboard implements OnInit {
     return this.busyKey() === key;
   }
 
-  private actionFailed(): void {
-    this.error.set('That moderation action could not be completed.');
+  private actionFailed(err: unknown): void {
+    this.error.set(backendErrorMessage(err, 'That moderation action could not be completed.'));
     this.busyKey.set('');
   }
 }

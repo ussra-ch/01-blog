@@ -2,17 +2,19 @@ import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { AuthService } from '../../../core/services/auth.service';
 import { Router, RouterLink } from '@angular/router';
-import { formatPercent } from '@angular/common';
+import { CommonModule } from '@angular/common';
+import { backendErrorMessage } from '../../../core/utils/backend-error';
 
 @Component({
   selector: 'app-register',
   standalone: true,
-  imports: [ReactiveFormsModule, RouterLink],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink],
   templateUrl: './register.component.html'
 })
 export class RegisterComponent {
   registerForm: FormGroup;
   selectedFile: File | null = null;
+  errorMessage = '';
 
   constructor(private fb: FormBuilder, private authService: AuthService, private router: Router) {
     this.registerForm =
@@ -47,9 +49,12 @@ export class RegisterComponent {
 
     if (formData) {
       // console.log(formData.sele)
+      this.errorMessage = '';
       this.authService.register(formData).subscribe({
         next: () => this.router.navigate(['/login']),
-        error: (err) => console.error('Registration failed', err)
+        error: (err: unknown) => {
+          this.errorMessage = backendErrorMessage(err, 'Registration failed. Please try again.');
+        }
       });
     }
   }

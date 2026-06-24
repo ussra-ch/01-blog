@@ -5,6 +5,7 @@ import { Comment, Post } from '../../../core/models/post';
 import { PostService } from '../../../core/services/post';
 import { AuthService } from '../../../core/services/auth.service';
 import { MediaUrlService } from '../../../core/services/media-url';
+import { backendErrorMessage } from '../../../core/utils/backend-error';
 
 @Component({
   selector: 'app-single-post',
@@ -29,6 +30,7 @@ export class SinglePost implements OnInit {
   submitting = false;
   liking = false;
   reporting = false;
+  errorMessage = '';
   liked = false;
   localLikes = 0;
 
@@ -72,7 +74,8 @@ export class SinglePost implements OnInit {
         this.post.likeCount = response.likeCount;
         this.liking = false;
       },
-      error: () => {
+      error: (err: unknown) => {
+        this.errorMessage = backendErrorMessage(err, 'Your like could not be saved. Please try again.');
         this.liked = previousLiked;
         this.localLikes = previousLikeCount;
         this.post.likedByCurrentUser = previousLiked;
@@ -95,16 +98,15 @@ export class SinglePost implements OnInit {
     if (!window.confirm('Submit this post report to the admin moderation team?')) return;
 
     this.reporting = true;
+    this.errorMessage = '';
     this.postService.reportPost(this.post.postId, trimmedReason).subscribe({
       next: () => {
         this.reporting = false;
         window.alert('Report submitted.');
       },
-      error: (error) => {
+      error: (error: unknown) => {
         this.reporting = false;
-        window.alert(error.status === 409
-          ? 'You already reported this post.'
-          : 'The report could not be submitted. Please try again.');
+        window.alert(backendErrorMessage(error, 'The report could not be submitted. Please try again.'));
       }
     });
   }
@@ -124,7 +126,8 @@ export class SinglePost implements OnInit {
         this.newComment = '';
         this.submitting = false;
       },
-      error: () => {
+      error: (err: unknown) => {
+        this.errorMessage = backendErrorMessage(err, 'Your comment could not be posted. Please try again.');
         this.submitting = false;
       }
     });
@@ -139,7 +142,8 @@ export class SinglePost implements OnInit {
         this.post.commentCount = comments.length;
         this.loadingComments = false;
       },
-      error: () => {
+      error: (err: unknown) => {
+        this.errorMessage = backendErrorMessage(err, 'Comments could not be loaded.');
         this.loadingComments = false;
       }
     });

@@ -14,6 +14,10 @@
 
     <form *ngIf="!loadingPost" [formGroup]="postForm" (ngSubmit)="onSubmit()">
 
+      <div *ngIf="saveError" class="error-message">
+        {{ saveError }}
+      </div>
+
       <!-- TITLE -->
       <div class="form-group">
         <label>Title</label>

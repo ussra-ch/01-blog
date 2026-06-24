@@ -7,6 +7,7 @@ import { PostService } from '../../../core/services/post';
 import { Post, PostDetails } from '../../../core/models/post';
 import { timeout } from 'rxjs';
 import { MediaUrlService } from '../../../core/services/media-url';
+import { backendErrorMessage } from '../../../core/utils/backend-error';
 
 @Component({
   selector: 'app-edit-post',
@@ -23,6 +24,7 @@ export class EditPost implements OnInit {
   currentMediaUrl: string | null = null;
   removeMedia = false;
   loadError = '';
+  saveError = '';
   postId!: number;
 
   constructor(
@@ -73,6 +75,7 @@ export class EditPost implements OnInit {
     if (this.postForm.invalid || this.loading) return;
 
     this.loading = true;
+    this.saveError = '';
     const formData = new FormData();
     formData.append('title', this.postForm.value.title);
     formData.append('description', this.postForm.value.content);
@@ -87,9 +90,9 @@ export class EditPost implements OnInit {
         this.loading = false;
         this.router.navigate(['/feed']);
       },
-      error: (err) => {
+      error: (err: unknown) => {
         this.loading = false;
-        console.error('Update post failed:', err);
+        this.saveError = backendErrorMessage(err, 'The post could not be saved. Please try again.');
       }
     });
   }
@@ -109,9 +112,11 @@ export class EditPost implements OnInit {
         this.prefillFromPostDetails(post);
         this.loadingPost = false;
       },
-      error: (err) => {
-        console.error('Load post failed:', err);
-        this.loadError = 'Could not load the latest post data. You can go back to the feed and try again.';
+      error: (err: unknown) => {
+        this.loadError = backendErrorMessage(
+          err,
+          'Could not load the latest post data. You can go back to the feed and try again.'
+        );
         this.loadingPost = false;
       }
     });

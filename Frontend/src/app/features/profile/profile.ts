@@ -12,6 +12,7 @@ import { PostService } from '../../core/services/post';
 import { UserProfileService } from '../../core/services/user-profile';
 import { PostCardComponent } from '../posts/post-card/post-card';
 import { SinglePost } from '../posts/single-post/single-post';
+import { backendErrorMessage } from '../../core/utils/backend-error';
 
 @Component({
   selector: 'app-profile',
@@ -98,7 +99,8 @@ export class ProfileComponent implements OnInit, OnDestroy {
         } : current);
         this.followLoading.set(false);
       },
-      error: () => {
+      error: (err: unknown) => {
+        this.error.set(backendErrorMessage(err, 'That follow action could not be completed.'));
         this.followLoading.set(false);
       }
     });
@@ -131,9 +133,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
       },
       error: (error: HttpErrorResponse) => {
         this.reportSubmitting.set(false);
-        this.reportError.set(error.status === 409
-          ? 'You already reported this profile.'
-          : 'The report could not be submitted. Please try again.');
+        this.reportError.set(backendErrorMessage(error, 'The report could not be submitted. Please try again.'));
       }
     });
   }
@@ -170,9 +170,9 @@ export class ProfileComponent implements OnInit, OnDestroy {
         this.clearAvatarPreview();
         this.avatarUploading.set(false);
       },
-      error: () => {
+      error: (err: unknown) => {
         this.clearAvatarPreview();
-        this.avatarError.set('The profile picture could not be updated.');
+        this.avatarError.set(backendErrorMessage(err, 'The profile picture could not be updated.'));
         this.avatarUploading.set(false);
       }
     });
@@ -190,6 +190,9 @@ export class ProfileComponent implements OnInit, OnDestroy {
           ...profile,
           postCount: Math.max(0, profile.postCount - 1)
         } : profile);
+      },
+      error: (err: unknown) => {
+        this.error.set(backendErrorMessage(err, 'The post could not be deleted. Please try again.'));
       }
     });
   }
@@ -212,8 +215,8 @@ export class ProfileComponent implements OnInit, OnDestroy {
         this.posts.set(posts);
         this.loading.set(false);
       },
-      error: () => {
-        this.error.set('This profile could not be loaded.');
+      error: (err: unknown) => {
+        this.error.set(backendErrorMessage(err, 'This profile could not be loaded.'));
         this.loading.set(false);
       }
     });

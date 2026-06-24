@@ -8,6 +8,10 @@
       </div>
     </div>
 
+    <div class="error-banner" *ngIf="error()">
+      {{ error() }}
+    </div>
+
     <div class="collection-layout" *ngIf="posts().length">
       <ng-container *ngFor="let section of exploreSections(); let sectionIndex = index">
         <div class="post-card-row">

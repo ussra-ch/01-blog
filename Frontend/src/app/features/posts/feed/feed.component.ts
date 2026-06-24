@@ -11,6 +11,7 @@ import { Router } from '@angular/router';
 import { RouterLink } from '@angular/router';
 import { SuggestedUser } from '../../../core/models/user';
 import { UserProfileService } from '../../../core/services/user-profile';
+import { backendErrorMessage } from '../../../core/utils/backend-error';
 
 @Component({
   selector: 'app-feed',
@@ -29,6 +30,7 @@ export class FeedComponent implements OnInit {
   posts = signal<Post[]>([]);
   suggestions = signal<SuggestedUser[]>([]);
   loading = signal(false);
+  error = signal('');
   suggestionsLoading = signal(false);
   followingUserIds = signal<number[]>([]);
   selectedPost: Post | null = null;
@@ -82,6 +84,7 @@ export class FeedComponent implements OnInit {
     if (this.loading() || this.reachedEnd) return;
 
     this.loading.set(true);
+    this.error.set('');
     this.postService.getPosts(this.page, this.pageSize).subscribe({
       next: (response: Post[]) => {
         this.posts.update(prev => [...prev, ...response]);
@@ -90,7 +93,7 @@ export class FeedComponent implements OnInit {
         this.loading.set(false);
       },
       error: (err: HttpErrorResponse) => {
-        console.error('Failed to load posts', err);
+        this.error.set(backendErrorMessage(err, 'Posts could not be loaded.'));
         this.loading.set(false);
       }
     });
@@ -126,8 +129,8 @@ export class FeedComponent implements OnInit {
             prev.filter(p => p.postId !== post.postId)
           );
         },
-        error: err => {
-          console.error("Delete failed:", err);
+        error: (err: unknown) => {
+          this.error.set(backendErrorMessage(err, 'The post could not be deleted. Please try again.'));
         }
       });
 

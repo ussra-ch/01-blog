@@ -2,6 +2,10 @@
 <main class="feed-wrapper">
   <div class="feed-layout">
     <section class="posts-column">
+      <div class="error-banner" *ngIf="error()">
+        {{ error() }}
+      </div>
+
       <div class="posts-list">
         <app-post-card
           *ngFor="let post of posts()"

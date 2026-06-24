@@ -181,6 +181,16 @@
   overflow: hidden;
 }
 
+.post-action-error {
+  margin: 0 0 0.6rem;
+  padding: 0.55rem 0.7rem;
+  color: var(--danger);
+  background: var(--danger-soft);
+  border-radius: 8px;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
 .post-title {
   font-size: 1.28rem;
   font-weight: 700;

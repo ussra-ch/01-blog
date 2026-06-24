@@ -8,6 +8,7 @@ import { Post } from '../../../core/models/post';
 import { PostService } from '../../../core/services/post';
 import { RouterLink } from '@angular/router';
 import { MediaUrlService } from '../../../core/services/media-url';
+import { backendErrorMessage } from '../../../core/utils/backend-error';
 
 
 export interface UserSummary {
@@ -39,6 +40,7 @@ export class PostCardComponent {
   voting = false;
   ownerMenuOpen = false;
   reporting = false;
+  actionError = '';
 
   get formattedDate(): string {
     return new Date(this.post.createdAt).toLocaleString('en-US', {
@@ -83,8 +85,8 @@ export class PostCardComponent {
         this.post.likedByCurrentUser = response.likedByCurrentUser;
         this.voting = false;
       },
-      error: (err) => {
-        console.error('Upvote failed:', err);
+      error: (err: unknown) => {
+        this.actionError = backendErrorMessage(err, 'Your upvote could not be saved. Please try again.');
         this.post.likedByCurrentUser = previousLiked;
         this.post.likeCount = previousLikeCount;
         this.voting = false;
@@ -130,16 +132,15 @@ export class PostCardComponent {
     if (!window.confirm('Submit this post report to the admin moderation team?')) return;
 
     this.reporting = true;
+    this.actionError = '';
     this.postService.reportPost(this.post.postId, trimmedReason).subscribe({
       next: () => {
         this.reporting = false;
         window.alert('Report submitted.');
       },
-      error: (error) => {
+      error: (error: unknown) => {
         this.reporting = false;
-        window.alert(error.status === 409
-          ? 'You already reported this post.'
-          : 'The report could not be submitted. Please try again.');
+        window.alert(backendErrorMessage(error, 'The report could not be submitted. Please try again.'));
       }
     });
   }

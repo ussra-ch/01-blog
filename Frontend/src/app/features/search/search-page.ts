@@ -10,6 +10,7 @@ import { SearchService } from '../../core/services/search';
 import { UserProfileService } from '../../core/services/user-profile';
 import { PostCardComponent } from '../posts/post-card/post-card';
 import { SinglePost } from '../posts/single-post/single-post';
+import { backendErrorMessage } from '../../core/utils/backend-error';
 
 @Component({
   selector: 'app-search-page',
@@ -59,7 +60,10 @@ export class SearchPage implements OnInit, OnDestroy {
 
   onDeletePost(post: Post): void {
     this.postService.deletePost(post.postId).subscribe({
-      next: () => this.posts.update(posts => posts.filter(item => item.postId !== post.postId))
+      next: () => this.posts.update(posts => posts.filter(item => item.postId !== post.postId)),
+      error: (err: unknown) => {
+        this.error.set(backendErrorMessage(err, 'The post could not be deleted. Please try again.'));
+      }
     });
   }
 
@@ -80,8 +84,8 @@ export class SearchPage implements OnInit, OnDestroy {
         this.posts.set(response.posts);
         this.loading.set(false);
       },
-      error: () => {
-        this.error.set('Search could not be completed.');
+      error: (err: unknown) => {
+        this.error.set(backendErrorMessage(err, 'Search could not be completed.'));
         this.loading.set(false);
       }
     });

@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import { CommonModule } from '@angular/common';
+import { backendErrorMessage } from '../../../core/utils/backend-error';
 
 @Component({
   selector: 'app-login',
@@ -29,7 +30,9 @@ export class LoginComponent {
     if (this.loginForm.valid) {
       this.authService.login(this.loginForm.value).subscribe({
         next: () => this.router.navigate(['/feed']),
-        error: (err) => this.errorMessage = 'Invalid credentials. Please try again.'
+        error: (err: unknown) => {
+          this.errorMessage = backendErrorMessage(err, 'Invalid credentials. Please try again.');
+        }
       });
     }
   }

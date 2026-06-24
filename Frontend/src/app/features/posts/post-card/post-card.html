@@ -75,6 +75,10 @@
   <!-- Post Body -->
   <div class="post-body flex-grow-1 min-w-0">
 
+    <p class="post-action-error" *ngIf="actionError">
+      {{ actionError }}
+    </p>
+
     <!-- Author -->
     <div class="post-author d-flex align-items-center gap-2 mb-2">
       <a

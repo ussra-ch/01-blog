@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { PostService } from '../../../core/services/post';
 import { Router } from '@angular/router';
 import { NavBar } from '../../../core/components/nav-bar/nav-bar';
+import { backendErrorMessage } from '../../../core/utils/backend-error';
 
 @Component({
   selector: 'app-create-post',
@@ -15,7 +16,8 @@ import { NavBar } from '../../../core/components/nav-bar/nav-bar';
 export class CreatePostComponent {
 
   loading = false;
-    selectedFile: File | null = null;
+  selectedFile: File | null = null;
+  errorMessage = '';
   postForm!: FormGroup;
   constructor(
     private fb: FormBuilder,
@@ -41,6 +43,7 @@ export class CreatePostComponent {
   onSubmit(): void {
     if (this.loading || this.postForm.invalid) return;
     this.loading = true;
+    this.errorMessage = '';
     const formData = new FormData();
     formData.append(
       'title',
@@ -61,9 +64,9 @@ export class CreatePostComponent {
         this.router.navigate(['/feed']);
       },
 
-      error: (err) => {
+      error: (err: unknown) => {
         this.loading = false;
-        console.error(err);
+        this.errorMessage = backendErrorMessage(err, 'The post could not be published. Please try again.');
       }
     });
   }
