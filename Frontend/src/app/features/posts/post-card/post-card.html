@@ -81,11 +81,11 @@
         [routerLink]="['/profile', post.author.id]"
         (click)="$event.stopPropagation()"
         class="author-avatar-link">
-        <div class="avatar" *ngIf="!post.author.profilePicture">
+        <div class="avatar" *ngIf="!authorAvatarSrc">
           {{ authorInitial }}
         </div>
-        <img *ngIf="post.author.profilePicture"
-          [src]="'http://localhost:8080/' + post.author.profilePicture"
+        <img *ngIf="authorAvatarSrc as avatarSrc"
+          [src]="avatarSrc"
           [alt]="post.author.username"
           class="avatar-img" />
       </a>

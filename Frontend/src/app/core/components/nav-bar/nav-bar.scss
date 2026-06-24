@@ -3,6 +3,9 @@
 }
 
 .navbar-moroccan {
+  position: sticky;
+  top: 0;
+  z-index: 1030;
   width: 100%;
   background-color: var(--page-bg);
   border-bottom: 1px solid var(--border);

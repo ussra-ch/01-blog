@@ -7,6 +7,7 @@ import { inject } from '@angular/core';
 import { Post } from '../../../core/models/post';
 import { PostService } from '../../../core/services/post';
 import { RouterLink } from '@angular/router';
+import { MediaUrlService } from '../../../core/services/media-url';
 
 
 export interface UserSummary {
@@ -34,6 +35,7 @@ export class PostCardComponent {
   constructor(private router: Router) {}
   private authService = inject(AuthService);
   private postService = inject(PostService);
+  private mediaUrl = inject(MediaUrlService);
   voting = false;
   ownerMenuOpen = false;
   reporting = false;
@@ -147,7 +149,11 @@ export class PostCardComponent {
   }
 
   get mediaSrc(): string | null {
-    return this.post.mediaUrl ? `http://localhost:8080/${this.post.mediaUrl}` : null;
+    return this.mediaUrl.resolve(this.post.mediaUrl);
+  }
+
+  get authorAvatarSrc(): string | null {
+    return this.mediaUrl.resolve(this.post.author.profilePicture);
   }
 
   get hasVideo(): boolean {

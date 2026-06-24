@@ -37,12 +37,12 @@
       </div>
 
       <!-- CURRENT IMAGE -->
-      <div class="form-group" *ngIf="currentMediaUrl">
+      <div class="form-group" *ngIf="currentMediaSrc">
         <label>Current Cover Image</label>
         <div class="current-cover-wrapper">
           <img
             class="current-cover"
-            [src]="'http://localhost:8080/' + currentMediaUrl"
+            [src]="currentMediaSrc"
             alt="Current post cover"
           />
           <button

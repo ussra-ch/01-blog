@@ -6,6 +6,7 @@ import { NavBar } from '../../core/components/nav-bar/nav-bar';
 import { Post, PostLikeResponse } from '../../core/models/post';
 import { PostService } from '../../core/services/post';
 import { SinglePost } from '../posts/single-post/single-post';
+import { MediaUrlService } from '../../core/services/media-url';
 
 interface ExploreSection {
   cards: Post[];
@@ -26,6 +27,7 @@ export class Explore implements OnInit {
   @ViewChild('scrollTrigger') scrollTrigger!: ElementRef;
 
   private postService = inject(PostService);
+  private mediaUrlService = inject(MediaUrlService);
   private page = 0;
   private pageSize = 24;
   private reachedEnd = false;
@@ -92,7 +94,7 @@ export class Explore implements OnInit {
   }
 
   mediaUrl(post: Post): string | null {
-    return post.mediaUrl ? `http://localhost:8080/${post.mediaUrl}` : null;
+    return this.mediaUrlService.resolve(post.mediaUrl);
   }
 
   coverUrl(post: Post): string {
@@ -104,7 +106,7 @@ export class Explore implements OnInit {
   }
 
   avatarUrl(post: Post): string | null {
-    return post.author.profilePicture ? `http://localhost:8080/${post.author.profilePicture}` : null;
+    return this.mediaUrlService.resolve(post.author.profilePicture);
   }
 
   authorInitial(post: Post): string {

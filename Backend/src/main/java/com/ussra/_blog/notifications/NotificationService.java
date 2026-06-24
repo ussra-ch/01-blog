@@ -8,11 +8,13 @@ import com.ussra._blog.posts.entity.Post;
 import com.ussra._blog.posts.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -79,9 +81,15 @@ public class NotificationService {
         return emitter;
     }
 
+    @Async("notificationExecutor")
     public void notifySubscribersAboutNewPost(Post post) {
         User author = userRepository.findById(post.getUserId()).orElseThrow();
         List<Subscription> subscriptions = subscriptionRepository.findAllByFollowingId(author.getId());
+        if (subscriptions.isEmpty()) {
+            return;
+        }
+
+        List<Notification> notifications = new ArrayList<>(subscriptions.size());
 
         for (Subscription subscription : subscriptions) {
             Notification notification = new Notification();
@@ -90,11 +98,15 @@ public class NotificationService {
             notification.setMessage(author.getUsername() + " published a new post: " + post.getTitle());
             notification.setActorUserId(author.getId());
             notification.setRelatedPostId(post.getId());
+            notifications.add(notification);
+        }
 
-            Notification saved = notificationRepository.save(notification);
-            NotificationResponse response = mapToResponse(saved);
-            sendNotification(subscription.getFollowerId(), response);
-            sendUnreadCount(subscription.getFollowerId());
+        List<Notification> savedNotifications = notificationRepository.saveAll(notifications);
+
+        for (Notification saved : savedNotifications) {
+            NotificationResponse response = mapNewPostNotification(saved, author);
+            sendNotification(saved.getUserId(), response);
+            sendUnreadCount(saved.getUserId());
         }
     }
 
@@ -140,6 +152,20 @@ public class NotificationService {
                     });
         }
 
+        return response;
+    }
+
+    private NotificationResponse mapNewPostNotification(Notification notification, User author) {
+        NotificationResponse response = new NotificationResponse();
+        response.setId(notification.getId());
+        response.setType(notification.getType());
+        response.setMessage(notification.getMessage());
+        response.setRead(notification.isRead());
+        response.setRelatedPostId(notification.getRelatedPostId());
+        response.setCreatedAt(notification.getCreatedAt());
+        response.setActorId(author.getId());
+        response.setActorUsername(author.getUsername());
+        response.setActorAvatarUrl(author.getAvatarUrl());
         return response;
     }
 

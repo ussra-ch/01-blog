@@ -39,7 +39,7 @@ export class CreatePostComponent {
   }
 
   onSubmit(): void {
-    if (this.postForm.invalid) return;
+    if (this.loading || this.postForm.invalid) return;
     this.loading = true;
     const formData = new FormData();
     formData.append(

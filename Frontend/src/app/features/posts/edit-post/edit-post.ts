@@ -6,6 +6,7 @@ import { NavBar } from '../../../core/components/nav-bar/nav-bar';
 import { PostService } from '../../../core/services/post';
 import { Post, PostDetails } from '../../../core/models/post';
 import { timeout } from 'rxjs';
+import { MediaUrlService } from '../../../core/services/media-url';
 
 @Component({
   selector: 'app-edit-post',
@@ -28,7 +29,8 @@ export class EditPost implements OnInit {
     private fb: FormBuilder,
     private route: ActivatedRoute,
     private router: Router,
-    private postService: PostService
+    private postService: PostService,
+    private mediaUrl: MediaUrlService
   ) {}
 
   ngOnInit(): void {
@@ -90,6 +92,10 @@ export class EditPost implements OnInit {
         console.error('Update post failed:', err);
       }
     });
+  }
+
+  get currentMediaSrc(): string | null {
+    return this.mediaUrl.resolve(this.currentMediaUrl);
   }
 
   private loadPost(): void {

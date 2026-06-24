@@ -11,6 +11,7 @@ spring:
   jpa:
     hibernate:
       ddl-auto: none
+    open-in-view: false
     show-sql: false
   servlet:
     multipart:

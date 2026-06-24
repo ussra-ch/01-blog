@@ -3,10 +3,12 @@ import { Injectable, inject, signal } from '@angular/core';
 import { Observable, tap } from 'rxjs';
 import { Post } from '../models/post';
 import { SuggestedUser, UserProfile } from '../models/user';
+import { MediaUrlService } from './media-url';
 
 @Injectable({ providedIn: 'root' })
 export class UserProfileService {
   private http = inject(HttpClient);
+  private mediaUrl = inject(MediaUrlService);
   private readonly usersUrl = 'http://localhost:8080/api/users';
   private readonly subscriptionsUrl = 'http://localhost:8080/api/subscriptions';
   currentAvatarUrl = signal<string | null>(null);
@@ -35,16 +37,7 @@ export class UserProfileService {
   }
 
   getAvatarUrl(avatarUrl: string | null): string | null {
-    if (!avatarUrl) {
-      return null;
-    }
-
-    if (avatarUrl.startsWith('http://') || avatarUrl.startsWith('https://')) {
-      return avatarUrl;
-    }
-
-    const normalizedPath = avatarUrl.startsWith('/') ? avatarUrl : `/${avatarUrl}`;
-    return encodeURI(`http://localhost:8080${normalizedPath}`);
+    return this.mediaUrl.resolve(avatarUrl);
   }
 
   loadCurrentAvatar(userId: number): void {

@@ -47,7 +47,10 @@ public class FileStorageService {
         String originalFilename = file.getOriginalFilename() == null
                 ? "upload"
                 : file.getOriginalFilename().replace('\\', '/');
-        String safeFilename = Paths.get(originalFilename).getFileName().toString();
+        String safeFilename = Paths.get(originalFilename)
+                .getFileName()
+                .toString()
+                .replaceAll("[^A-Za-z0-9._-]", "_");
         String filename = UUID.randomUUID() + "_" + safeFilename;
         Path filePath = uploadPath.resolve(filename);
         Files.copy(file.getInputStream(), filePath);

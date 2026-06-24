@@ -36,9 +36,9 @@
 
         <!-- Author row -->
         <div class="d-flex align-items-center gap-2 mb-3">
-          <div class="avatar" *ngIf="!post.author.profilePicture">{{ authorInitial }}</div>
-          <img *ngIf="post.author.profilePicture"
-            [src]="post.author.profilePicture"
+          <div class="avatar" *ngIf="!authorAvatarSrc">{{ authorInitial }}</div>
+          <img *ngIf="authorAvatarSrc as avatarSrc"
+            [src]="avatarSrc"
             [alt]="post.author.username"
             class="avatar-img" />
           <div class="author-meta">
@@ -128,9 +128,9 @@
           </div>
 
           <div class="comment-item" *ngFor="let c of comments">
-            <div class="comment-avatar" *ngIf="!c.author.profilePicture">{{ commentInitial(c) }}</div>
-            <img *ngIf="c.author.profilePicture"
-              [src]="c.author.profilePicture"
+            <div class="comment-avatar" *ngIf="!commentAvatarSrc(c)">{{ commentInitial(c) }}</div>
+            <img *ngIf="commentAvatarSrc(c) as avatarSrc"
+              [src]="avatarSrc"
               [alt]="c.author.username"
               class="comment-avatar-img" />
             <div class="comment-body">

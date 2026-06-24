@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Comment, Post } from '../../../core/models/post';
 import { PostService } from '../../../core/services/post';
 import { AuthService } from '../../../core/services/auth.service';
+import { MediaUrlService } from '../../../core/services/media-url';
 
 @Component({
   selector: 'app-single-post',
@@ -20,6 +21,7 @@ export class SinglePost implements OnInit {
 
   private postService = inject(PostService);
   private authService = inject(AuthService);
+  private mediaUrl = inject(MediaUrlService);
 
   newComment = '';
   comments: Comment[] = [];
@@ -177,7 +179,15 @@ export class SinglePost implements OnInit {
   }
 
   get mediaSrc(): string | null {
-    return this.post.mediaUrl ? `http://localhost:8080/${this.post.mediaUrl}` : null;
+    return this.mediaUrl.resolve(this.post.mediaUrl);
+  }
+
+  get authorAvatarSrc(): string | null {
+    return this.mediaUrl.resolve(this.post.author.profilePicture);
+  }
+
+  commentAvatarSrc(comment: Comment): string | null {
+    return this.mediaUrl.resolve(comment.author.profilePicture);
   }
 
   get hasVideo(): boolean {
